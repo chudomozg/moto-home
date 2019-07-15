@@ -18,7 +18,7 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 
         Field::make( 'select', 'motohome_city', 'Город' )
         ->set_options( array(
-                '0' => 'Сначала выберите Регион',
+                '2370' => 'Москва',
                 '1' => 'Работает',
         ) )
         ->set_width( 50 ),

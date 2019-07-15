@@ -254,11 +254,13 @@ function mthome_ad_yascript_add_front( $hook ){
 	if( is_page() || is_single() ){
 		//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
 		wp_enqueue_script('yamaps_api_front', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
+		wp_enqueue_script('yamap_front.js', plugins_url('moto-home/js/yamap_front.js'));
 	}
 	
 
 }
-
+//Страница списка мотодомов///////////////////////////////////////////////////////////////////////////////////////////////
+//Функция, которая выводит контент списка мотодомов (шорткод [mth_motohome])
 function mtc_page_motohome(){
 
 	echo "Здрасти";
@@ -266,4 +268,57 @@ function mtc_page_motohome(){
 }
 add_shortcode( 'mth_motohome' ,'mtc_page_motohome' );
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Страница одного мотодома
+
+//Template Replacement
+add_action("template_redirect", 'mth_template_redirect');
+
+function mth_template_redirect() {
+    global $wp;
+    $plugindir = dirname( __FILE__ );
+
+    //A Custom Post Type
+	if (get_query_var('post_type') == 'motohome') {
+        $templatefilename = 'single-motohome.php';
+        if (file_exists(TEMPLATEPATH . '/' . $templatefilename)) {
+            $return_template = TEMPLATEPATH . '/' . $templatefilename;
+        } else {
+            $return_template = $plugindir . '/themefiles/' . $templatefilename;
+        }
+        do_theme_redirect($return_template);
+
+    //A Custom Taxonomy - еще пригодится
+    // } elseif ($wp->query_vars["taxonomy"] == 'product_categories') {
+    //     $templatefilename = 'taxonomy-product_categories.php';
+    //     if (file_exists(TEMPLATEPATH . '/' . $templatefilename)) {
+    //         $return_template = TEMPLATEPATH . '/' . $templatefilename;
+    //     } else {
+    //         $return_template = $plugindir . '/themefiles/' . $templatefilename;
+    //     }
+    //     do_theme_redirect($return_template);
+
+    //A Standard Page
+    // } elseif ($wp->query_vars["pagename"] == 'somepagename') {
+    //     $templatefilename = 'page-somepagename.php';
+    //     if (file_exists(TEMPLATEPATH . '/' . $templatefilename)) {
+    //         $return_template = TEMPLATEPATH . '/' . $templatefilename;
+    //     } else {
+    //         $return_template = $plugindir . '/themefiles/' . $templatefilename;
+    //     }
+    //     do_theme_redirect($return_template);
+	// }
+	}
+}
+
+function do_theme_redirect($url) {
+    global $post, $wp_query;
+    if (have_posts()) {
+        include($url);
+        die();
+    } else {
+        $wp_query->is_404 = true;
+    }
+}
  ?>

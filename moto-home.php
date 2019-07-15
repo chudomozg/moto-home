@@ -12,60 +12,29 @@
  * Network:     false.
  */
 
-
-//ДЕБАГ - НЕ ЗАБУДЬ УДАЛИТЬ///////////////////////////////////////////////////////////////////////////////
+//ДЕБАГ - НЕ ЗАБУДЬ ЗАКОМЕНТИТЬ///////////////////////////////////////////////////////////////////////////////
 if( WP_DEBUG && WP_DEBUG_DISPLAY && (defined('DOING_AJAX') && DOING_AJAX) ){
     @ ini_set( 'display_errors', 1 );
 }
-//ДЕБАГ - НЕ ЗАБУДЬ УДАЛИТЬ///////////////////////////////////////////////////////////////////////////////
 
+// require_once( dirName(__FILE__). '/ChromePhp.php' );//расширение для вывода php переменных в консоль Chrome
+include( dirName(__FILE__). '/ChromePhp.php' );//расширение для вывода php переменных в консоль Chrome
+//ДЕБАГ - НЕ ЗАБУДЬ ЗАКОМЕНТИТЬ///////////////////////////////////////////////////////////////////////////////
+
+function mth_install_notice() {
+	?>
+	<div class="notice notice-success is-dismissible">
+		<p>Настройки обновлены!</p>
+	</div>
+	<?php
+}
 
 global $motohome_db_version;
-$motohome_db_version = "1.0";
+$motohome_db_version = "2.0";
 // require_once(ABSPATH . 'wp-content/plugins/moto-home/cmb2-functions.php');//ф-ции для cmb2 полей
 //ф-ция установки плагина, тут добавим таблицы в БД, тип POST, meta-поля и др. настройки
- function motohome_install(){
-    global $wpdb;
-    global $motohome_db_version;
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-   // require_once(dirName(__FILE__) . 'mt_ajax_select.php');
-
-    //таблица комнат
-    $table_name = $wpdb->prefix . "mthome_rooms";
-    if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-      
-        $sql = "CREATE TABLE " . $table_name . " (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        id_dom int(11) NOT NULL default '0',
-        name tinytext NOT NULL,
-        UNIQUE KEY id (id)
-      );";
-  
-        dbDelta($sql);
-    }
-
-    // таблица заявок
-     $table_name = $wpdb->prefix . "mthome_booking";
-    if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-      
-        $sql = "CREATE TABLE " . $table_name . " (
-        id int(11) NOT NULL AUTO_INCREMENT,
-        id_room mediumint(9) NOT NULL default '0',
-        date_start datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        date_end datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        UNIQUE KEY id (id)
-      );";
-  
-        dbDelta($sql);
-  
-        // $rows_affected = $wpdb->insert( $table_name, array( 'time' => current_time('mysql'), 'name' => $welcome_name, 'text' => $welcome_text ) );
-   
-        add_option("motohome_db_version", $motohome_db_version);
-     }
-
-     //  добавим сообщение про то, что для работы нужен плагин CMB2
-    //add_action( 'admin_notices', array( $this, 'test_notice' ) );
-
+ function motohome_install(){	
+	add_action( 'admin_notices', 'mth_install_notice' );	
  }
 //хук активации (установки) плагина
 register_activation_hook( __FILE__, 'motohome_install' );
@@ -172,11 +141,16 @@ function mt_booking_type_register() {
 
 //подключаем скрипты Yamaps к админке
 add_action( 'admin_enqueue_scripts', 'mthome_ad_yascript_add' );
-function mthome_ad_yascript_add( $hook_suffix ){
-    //ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
+function mthome_ad_yascript_add( $hook ){
+	$screen = get_current_screen();
+    if ( strpos($screen->post_type, 'motohome') === false){
+        return;
+	}
+	//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
 	wp_enqueue_script('yamaps_api', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
 	wp_enqueue_script('yamap.js', plugins_url('moto-home/js/yamap.js'));
     wp_enqueue_script('mt_rooms.js', plugins_url('moto-home/js/mt_rooms.js'));
+    wp_enqueue_script('mt_home.js', plugins_url('moto-home/js/mt_home.js'));
     wp_localize_script( 'mt_rooms.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'dir_url', dirName(__FILE__));
 }
@@ -235,5 +209,61 @@ function mth_select_update(){
 }
 
 add_action( 'wp_ajax_mth_select_update', 'mth_select_update' );
-add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' );
+add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' ); //проверить будет ли работать без нее с правами на опр польз
+
+//функция для добавления опций в селект регион
+function mth_reion_select_fill (){
+	$terms = get_terms( array(
+		'taxonomy'      =>  'wp_cn_city' , // название таксономии с WP 4.5
+		'orderby'       => 'id', 
+		'order'         => 'ASC',
+		'hide_empty'    => false, 
+		'object_ids'    => null,
+		'include'       => array(),
+		'exclude'       => array(), 
+		'exclude_tree'  => array(), 
+		'number'        => '', 
+		'fields'        => 'id=>name', 
+		'count'         => false,
+		'slug'          => '', 
+		'parent'         => '0',
+		'hierarchical'  => true, 
+		'child_of'      => 0, 
+		'get'           => '', // ставим all чтобы получить все термины
+		'name__like'    => '',
+		'pad_counts'    => false, 
+		'offset'        => '', 
+		'search'        => '', 
+		'cache_domain'  => 'core',
+		'name'          => '',    // str/arr поле name для получения термина по нему. C 4.2.
+		'childless'     => false, // true не получит (пропустит) термины у которых есть дочерние термины. C 4.2.
+		'update_term_meta_cache' => true, // подгружать метаданные в кэш
+		'meta_query'    => '',
+	) );
+	
+	return $terms;
+}
+
+//добавляем Яндекс Карты АПИ на фронтэнд
+add_action( 'wp_enqueue_scripts', 'mthome_ad_yascript_add_front' );
+function mthome_ad_yascript_add_front( $hook ){
+	// $screen = get_current_screen();
+    // if ( strpos($screen->post_type, 'motohome') === false){
+    //     return;
+	// }
+	if( is_page() || is_single() ){
+		//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
+		wp_enqueue_script('yamaps_api_front', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
+	}
+	
+
+}
+
+function mtc_page_motohome(){
+
+	echo "Здрасти";
+	
+}
+add_shortcode( 'mth_motohome' ,'mtc_page_motohome' );
+
  ?>

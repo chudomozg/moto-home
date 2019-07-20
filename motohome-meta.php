@@ -12,21 +12,28 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 	Field::make( 'media_gallery', 'motohome_gallery', __( 'Media Gallery' ) )
         ->set_type( array( 'image' ) ),
 
+        //регион и город
         Field::make( 'select', 'motohome_region', 'Регион' )
         ->set_options(mth_reion_select_fill())
-        ->set_width( 50 ),
+        ->set_width( 50 )
+        ->set_classes( 'back_motohome_region' ),
 
         Field::make( 'select', 'motohome_city', 'Город' )
         ->set_options( array(
                 '2370' => 'Москва',
                 '1' => 'Работает',
         ) )
-        ->set_width( 50 ),
+        ->set_visible_in_rest_api( true )
+        ->set_width( 50 )
+        ->set_classes( 'back_motohome_city' ),
+
+        Field::make( 'hidden', 'mth_hidden_city', '' ),
 
 	//Местоположение, карта, координаты
 	Field::make( 'text', 'motohome_loc', "Местоположение" )
 	->set_attribute( 'readOnly', 'true' )
-	->set_classes( 'mthome_ad_coord_text' ),
+        ->set_classes( 'mthome_ad_coord_text' )
+        ->set_visible_in_rest_api( true ),
 	Field::make("html", "crb_information_text", 'Предупреждение')
 		 ->set_html(
 			 '<div id="map" style="width: 100%; height: 400px"></div>'
@@ -44,4 +51,5 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 		->set_visible_in_rest_api( true )
 
 ) );
+
 ?>

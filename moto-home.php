@@ -150,7 +150,8 @@ function mthome_ad_yascript_add( $hook ){
 	wp_enqueue_script('yamaps_api', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
 	wp_enqueue_script('yamap.js', plugins_url('moto-home/js/yamap.js'));
     wp_enqueue_script('mt_rooms.js', plugins_url('moto-home/js/mt_rooms.js'));
-    wp_enqueue_script('mt_home.js', plugins_url('moto-home/js/mt_home.js'));
+	wp_enqueue_script('mt_home.js', plugins_url('moto-home/js/mt_home.js'));
+	wp_localize_script( 'mt_home.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'dir_url', dirName(__FILE__));
 }
@@ -254,7 +255,9 @@ function mthome_ad_yascript_add_front( $hook ){
 	if( is_page() || is_single() ){
 		//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
 		wp_enqueue_script('yamaps_api_front', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
-		wp_enqueue_script('yamap_front.js', plugins_url('moto-home/js/yamap_front.js'));
+		wp_enqueue_script('yamap_front.js', plugins_url('moto-home/js/yamap_front.js'), array('jquery', 'mt_home_front.js'));
+		wp_enqueue_script('mt_home_front.js', plugins_url('moto-home/js/mt_home_front.js'), array('jquery'));
+		wp_localize_script( 'mt_home_front.js', 'site_url', get_site_url());
 	}
 	
 
@@ -262,23 +265,20 @@ function mthome_ad_yascript_add_front( $hook ){
 //Страница списка мотодомов///////////////////////////////////////////////////////////////////////////////////////////////
 //Функция, которая выводит контент списка мотодомов (шорткод [mth_motohome])
 function mtc_page_motohome(){
-
-	echo "Здрасти";
-	
+	//echo "Здрасти";
 }
 add_shortcode( 'mth_motohome' ,'mtc_page_motohome' );
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Добавляем шаблоны
 //Страница одного мотодома
-
 //Template Replacement
 add_action("template_redirect", 'mth_template_redirect');
 
 function mth_template_redirect() {
     global $wp;
     $plugindir = dirname( __FILE__ );
-
     //A Custom Post Type
 	if (get_query_var('post_type') == 'motohome') {
         $templatefilename = 'single-motohome.php';
@@ -299,16 +299,16 @@ function mth_template_redirect() {
     //     }
     //     do_theme_redirect($return_template);
 
+	//Страница всех мотодомов
     //A Standard Page
-    // } elseif ($wp->query_vars["pagename"] == 'somepagename') {
-    //     $templatefilename = 'page-somepagename.php';
-    //     if (file_exists(TEMPLATEPATH . '/' . $templatefilename)) {
-    //         $return_template = TEMPLATEPATH . '/' . $templatefilename;
-    //     } else {
-    //         $return_template = $plugindir . '/themefiles/' . $templatefilename;
-    //     }
-    //     do_theme_redirect($return_template);
-	// }
+    } elseif (get_query_var('name') == 'motohome') {
+        $templatefilename = 'page-motohome.php';
+        if (file_exists(TEMPLATEPATH . '/' . $templatefilename)) {
+            $return_template = TEMPLATEPATH . '/' . $templatefilename;
+        } else {
+            $return_template = $plugindir . '/themefiles/' . $templatefilename;
+        }
+        do_theme_redirect($return_template);
 	}
 }
 
@@ -321,4 +321,35 @@ function do_theme_redirect($url) {
         $wp_query->is_404 = true;
     }
 }
+
+
+add_action('save_post', 'mth_set_city_to_taxonomy');
+
+function mth_set_city_to_taxonomy(){
+	if ($_POST['post_type']!='motohome' )
+		return;
+	//echo "<pre>".print_r($_POST)."</pre>";
+	$term_id = $_POST['carbon_fields_compact_input']['_motohome_city'];
+	if ($term_id!=1){
+		$post_ID = $_POST['post_ID'];
+		$tags = $term_id + 0;
+		$taxonomy='wp_cn_city';
+		$append=false;
+		wp_set_post_terms( $post_ID, $tags, $taxonomy, $append );
+	}
+}
+
+
+add_action( 'wp_ajax_mth_get_term_to_hid_city_inp', 'mth_get_term_to_hid_city_inp' );
+add_action( 'wp_ajax_nopriv_mth_get_term_to_hid_city_inp', 'mth_get_term_to_hid_city_inp' );
+
+function mth_get_term_to_hid_city_inp(){
+	if ($_POST['post_id']){
+		$post_id=$_POST['post_id'];
+	}
+	$taxonomy='wp_cn_city';
+	$term= wp_get_post_terms( $post_id, $taxonomy,['ids'] );
+	wp_send_json( $term);
+}
+
  ?>

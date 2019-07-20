@@ -10,7 +10,7 @@ function init() {
     if (mthome_tinput !== undefined) {
         if (mthome_tinput.value) {
             coords_from_input = mthome_tinput.value.split(", ").map(Number);
-            console.log(coords_from_input);
+            //console.log(coords_from_input);
         } else {
             coords_from_input = [55.753994, 37.622093];
         }

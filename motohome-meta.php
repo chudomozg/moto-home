@@ -10,7 +10,9 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 
 	//Галерея - фотографии МотоДома
 	Field::make( 'media_gallery', 'motohome_gallery', __( 'Media Gallery' ) )
-        ->set_type( array( 'image' ) ),
+        ->set_type( array( 'image' ) )
+        ->set_visible_in_rest_api( true )
+,
 
         //регион и город
         Field::make( 'select', 'motohome_region', 'Регион' )

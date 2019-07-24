@@ -258,6 +258,11 @@ function mthome_ad_yascript_add_front( $hook ){
 		wp_enqueue_script('yamap_front.js', plugins_url('moto-home/js/yamap_front.js'), array('jquery', 'mt_home_front.js'));
 		wp_enqueue_script('mt_home_front.js', plugins_url('moto-home/js/mt_home_front.js'), array('jquery'));
 		wp_localize_script( 'mt_home_front.js', 'site_url', get_site_url());
+		wp_enqueue_script('moment.min.js', plugins_url('moto-home/js/moment.min.js'), array('jquery'));
+		wp_enqueue_script('moment-locale', plugins_url('moto-home/js/ru.js'), array('jquery', 'moment.min.js'));
+		wp_enqueue_script('underscore-min.js', plugins_url('moto-home/js/underscore-min.js'), array('jquery'));
+		wp_enqueue_script('clndr.js', plugins_url('moto-home/js/clndr.js'), array('jquery', 'moment.min.js', 'underscore-min.js'));
+		//wp_enqueue_media();
 	}
 	
 

@@ -30,7 +30,7 @@ function mth_get_city_to_select(parent_id) {
         }));
         $(function() {
             $.ajax({
-                url: site_url + '/wp-json/wp/v2/wp_cn_city?parent=' + parent_id + '&per_page=99',
+                url: site_url + '/wp-json/wp/v2/wp_cn_city?parent=' + parent_id + '&per_page=100',
                 type: 'GET',
                 data_type: 'json',
                 success: function(data) {
@@ -42,6 +42,22 @@ function mth_get_city_to_select(parent_id) {
                             text: name.name
                         }));
                     });
+                    if (data.length > 99) { //надо исправить при рефакторинге, написать нормальный цикл (сейчас используется только в одном случае (Москва))
+                        $.ajax({
+                            url: site_url + '/wp-json/wp/v2/wp_cn_city?parent=' + parent_id + '&per_page=100&page=2',
+                            type: 'GET',
+                            data_type: 'json',
+                            success: function(data) {
+                                //console.log(data);
+                                $.each(data, function(i, name) {
+                                    $(city_select).append($('<option>', {
+                                        value: name.id,
+                                        text: name.name
+                                    }));
+                                });
+                            }
+                        });
+                    }
                     var hidden_city = 'input[name="carbon_fields_compact_input[_mth_hidden_city]"]';
                     if ($(hidden_city).val() != 0) {
                         $(city_select + ' option[value="' + $(hidden_city).val() + '"]').prop('selected', true);

@@ -63,7 +63,7 @@ function mth_yamap_add_city_collection(mth_homes_array) {
     //console.log(mth_homes_array);
     if (mth_homes_array.length) {
         mth_homes_array.forEach(function(mth_home) {
-            console.log(mth_home);
+            //console.log(mth_home);
             var mth_cord = mth_home.motohome_loc.split(',').map(parseFloat);
             mthCollectionArray.add(new ymaps.Placemark(mth_cord, {
                 balloonContent: mth_home.title.rendered

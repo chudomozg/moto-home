@@ -29,24 +29,36 @@ Container::make( 'post_meta', 'Настройки брони МотоДома' )
         ) )
         ->set_required( true )
         ->set_visible_in_rest_api( true )
-        ->set_width( 33 ),
+        ->set_width( 50 ),
 
-    //Дата брони
-    Field::make( 'date', 'mth_bookdate_start','Бронь с' )
-         ->set_storage_format( 'd.m.Y' )
-         ->set_input_format( 'd.m.Y', 'd.m.Y' )
-         ->set_width( 33 )
-         ->set_required( true ),
+    //Дата брони старая
+    // Field::make( 'date', 'mth_bookdate_start','Бронь с' )
+    //      ->set_storage_format( 'd.m.Y' )
+    //      ->set_input_format( 'd.m.Y', 'd.m.Y' )
+    //      ->set_width( 33 )
+    //      ->set_required( true )
+    //      ->set_picker_options( array(
+    //         'mode' => 'range',
+    //         //'disable' => mth_get_disable_dates(),
+    //     ) ),
 
-    Field::make( 'date', 'mth_bookdate_end', "До" )
-         ->set_storage_format( 'd.m.Y' )
-         ->set_input_format( 'd.m.Y', 'd.m.Y' )
-         ->set_width( 33 )
-         ->set_required( true ),
+    // Field::make( 'date', 'mth_bookdate_end', "До" )
+    //      ->set_storage_format( 'd.m.Y' )
+    //      ->set_input_format( 'd.m.Y', 'd.m.Y' )
+    //      ->set_width( 33 )
+    //      ->set_required( true ),
 
+    //Дата брони 
+    Field::make( 'text', 'mth_bookdate', 'Дата бронирвоания' )
+    ->set_classes( 'mth_booking_date_input' )
+    //->set_required( true )
+    ->set_visible_in_rest_api( true )
+    ->set_width( 50 )
+    ->set_default_value( "" ),
     
     //скрытое поле для id комнаты (костыль из-за динамических опций)
-    Field::make( 'hidden', 'mth_rooms_select_hidden',''),
+    Field::make( 'hidden', 'mth_rooms_select_hidden','')
+    ->set_visible_in_rest_api( true ),
          //->set_attribute( 'readOnly', 'true' ),
 ) );
 

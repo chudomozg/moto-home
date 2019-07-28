@@ -143,7 +143,7 @@ function mt_booking_type_register() {
 add_action( 'admin_enqueue_scripts', 'mthome_ad_yascript_add' );
 function mthome_ad_yascript_add( $hook ){
 	$screen = get_current_screen();
-    if ( strpos($screen->post_type, 'motohome') === false){
+    if ( strpos($screen->post_type, 'motohome') === true){
         return;
 	}
 	//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
@@ -155,6 +155,23 @@ function mthome_ad_yascript_add( $hook ){
     wp_localize_script( 'mt_rooms.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'dir_url', dirName(__FILE__));
 }
+
+
+//скрипты на страницу брони
+add_action( 'admin_enqueue_scripts', 'mthome_ad_rooms_add' );
+function mthome_ad_rooms_add( $hook ){
+	$screen = get_current_screen();
+    if ( strpos($screen->post_type, 'mt_booking') === true){
+        return;
+	}
+    wp_enqueue_script('mt_rooms.js', plugins_url('moto-home/js/mt_rooms.js'));
+	wp_enqueue_script('mt_home.js', plugins_url('moto-home/js/mt_home.js'));
+	//wp_enqueue_script('flatpkr-loc-ru.js', 'https://unpkg.com/flatpickr@3.1.2/dist/l10n/ru.js', array('jquery', 'moment.min.js', 'underscore-min.js'));
+	wp_localize_script( 'mt_home.js', 'site_url', get_site_url());
+    wp_localize_script( 'mt_rooms.js', 'site_url', get_site_url());
+    wp_localize_script( 'mt_rooms.js', 'dir_url', dirName(__FILE__));
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //Добавляем мета-поля для типа motohome
@@ -211,6 +228,28 @@ function mth_select_update(){
 
 add_action( 'wp_ajax_mth_select_update', 'mth_select_update' );
 add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' ); //проверить будет ли работать без нее с правами на опр польз
+
+
+function mth_date_picker_get_booking_id(){
+	if (isset($_POST['room_id'])){
+		$room_id = $_POST['room_id'];
+		global $wpdb;
+		$booking_ids =[];
+		$sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'")';
+		//ChromePhp::log($sql); 
+		$sql_request =  $wpdb->get_results($sql);
+		if ($sql_request){
+			foreach ($sql_request as $booking_id){
+				array_push($booking_ids, $booking_id);
+			}
+			wp_send_json($booking_ids);
+		}
+	}
+
+}
+
+add_action( 'wp_ajax_mth_date_picker_get_booking_id', 'mth_date_picker_get_booking_id' );
+add_action( 'wp_ajax_nopriv_mth_date_picker_get_booking_id', 'mth_date_picker_get_booking_id' );
 
 //функция для добавления опций в селект регион
 function mth_reion_select_fill (){
@@ -328,11 +367,9 @@ function do_theme_redirect($url) {
 }
 
 
-add_action('save_post', 'mth_set_city_to_taxonomy');
+add_action('save_post_motohome', 'mth_set_city_to_taxonomy');
 
-function mth_set_city_to_taxonomy(){
-	if ($_POST['post_type']!='motohome' )
-		return;
+function mth_set_city_to_taxonomy(){	
 	//echo "<pre>".print_r($_POST)."</pre>";
 	$term_id = $_POST['carbon_fields_compact_input']['_motohome_city'];
 	if ($term_id!=1){
@@ -341,6 +378,19 @@ function mth_set_city_to_taxonomy(){
 		$taxonomy='wp_cn_city';
 		$append=false;
 		wp_set_post_terms( $post_ID, $tags, $taxonomy, $append );
+	}
+}
+
+//add_action('save_post_mt_booking', 'mth_id_to_title');
+add_filter( 'wp_insert_post_data' , 'mth_id_to_title' , '99', 1 );
+
+function mth_id_to_title($data){
+	if ($data['post_type']=='mt_booking'){
+		$data['post_title'] = $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
+		return $data;
+	}
+	if ($data['post_type']=='motohome'){
+		//можно добавить id в title мотодомов
 	}
 }
 

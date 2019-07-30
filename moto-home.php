@@ -230,26 +230,37 @@ add_action( 'wp_ajax_mth_select_update', 'mth_select_update' );
 add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' ); //проверить будет ли работать без нее с правами на опр польз
 
 
-function mth_date_picker_get_booking_id(){
+function mth_date_picker_get_booking_time(){
 	if (isset($_POST['room_id'])){
-		$room_id = $_POST['room_id'];
+		$room_ids = $_POST['room_id'];
 		global $wpdb;
-		$booking_ids =[];
-		$sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'")';
-		//ChromePhp::log($sql); 
-		$sql_request =  $wpdb->get_results($sql);
-		if ($sql_request){
-			foreach ($sql_request as $booking_id){
-				array_push($booking_ids, $booking_id);
+		$send_data=[];
+		foreach ($room_ids as $room_id){
+			$booking_times =[];
+			$stack =[];
+			$sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'")';
+			//ChromePhp::log($sql); 
+			$sql_request =  $wpdb->get_results($sql);
+			if ($sql_request){
+				foreach ($sql_request as $booking_time){
+					array_push($booking_times, $booking_time);
+					//ChromePhp::log($booking_time);
+				}
 			}
-			wp_send_json($booking_ids);
+			// ChromePhp::log('тут');
+			//ChromePhp::log($booking_times);
+			$stack = array_push_assoc($stack, 'room_id', $room_id);
+			$stack = array_push_assoc($stack, 'booking_time', $booking_times);
+			array_push($send_data, $stack);
 		}
+		//ChromePhp::log($send_data);
+		wp_send_json($send_data);
 	}
 
 }
 
-add_action( 'wp_ajax_mth_date_picker_get_booking_id', 'mth_date_picker_get_booking_id' );
-add_action( 'wp_ajax_nopriv_mth_date_picker_get_booking_id', 'mth_date_picker_get_booking_id' );
+add_action( 'wp_ajax_mth_date_picker_get_booking_time', 'mth_date_picker_get_booking_time' );
+add_action( 'wp_ajax_nopriv_mth_date_picker_get_booking_time', 'mth_date_picker_get_booking_time' );
 
 //функция для добавления опций в селект регион
 function mth_reion_select_fill (){
@@ -295,12 +306,15 @@ function mthome_ad_yascript_add_front( $hook ){
 		//ВНИМАНИЕ ЗАМЕНИ НА СВОЙ ключ API в ссылке 
 		wp_enqueue_script('yamaps_api_front', 'https://api-maps.yandex.ru/2.1/?apikey=01be389f-988a-42c3-8fb5-5a5fcd4179d2&lang=ru_RU');
 		wp_enqueue_script('yamap_front.js', plugins_url('moto-home/js/yamap_front.js'), array('jquery', 'mt_home_front.js'));
-		wp_enqueue_script('mt_home_front.js', plugins_url('moto-home/js/mt_home_front.js'), array('jquery'));
+		wp_enqueue_script('mt_rooms.js', plugins_url('moto-home/js/mt_rooms.js'));
+		wp_enqueue_script('mt_home_front.js', plugins_url('moto-home/js/mt_home_front.js'), array('jquery', 'mt_rooms.js'));
 		wp_localize_script( 'mt_home_front.js', 'site_url', get_site_url());
 		wp_enqueue_script('moment.min.js', plugins_url('moto-home/js/moment.min.js'), array('jquery'));
 		wp_enqueue_script('moment-locale', plugins_url('moto-home/js/ru.js'), array('jquery', 'moment.min.js'));
 		wp_enqueue_script('underscore-min.js', plugins_url('moto-home/js/underscore-min.js'), array('jquery'));
 		wp_enqueue_script('clndr.js', plugins_url('moto-home/js/clndr.js'), array('jquery', 'moment.min.js', 'underscore-min.js'));
+		wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr');
+		wp_enqueue_style('flatpickr.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css');
 		//wp_enqueue_media();
 	}
 	
@@ -388,9 +402,6 @@ function mth_id_to_title($data){
 	if ($data['post_type']=='mt_booking'){
 		$data['post_title'] = $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
 		return $data;
-	}
-	if ($data['post_type']=='motohome'){
-		//можно добавить id в title мотодомов
 	}
 }
 

@@ -86,7 +86,9 @@ function mth_add_home_list(mth_homes_array) {
         var home_list_id = [];
         if (mth_homes_array.length) {
             var media_id_arr = [];
+
             mth_homes_array.forEach(function(mth_home) {
+                console.log(mth_home);
                 var home_coords = mth_home.motohome_loc.split(", ").map(Number);
                 //console.log(mth_home.motohome_gallery);
                 //console.log(mth_get_media_by_id(mth_home.motohome_gallery));
@@ -101,7 +103,7 @@ function mth_add_home_list(mth_homes_array) {
                 var home_html = '' +
                     '<div>' +
                     '   <div class="mth_list_cal" id="mth_list_cal-' + mth_home.id + '">' +
-                    '   </div>' +
+                    '   </div>' + '<input type="hidden" id="mth_hid_cal_input_' + mth_home.id + '">' +
                     '   <div class="mth_minimap"><img src="' + home_map + '">' +
                     '   </div>' +
                     '   <div class="mth_list_gallery">' + media_html +
@@ -121,8 +123,16 @@ function mth_add_home_list(mth_homes_array) {
                 $('#mth_list_cal-' + home_list_id[i]).clndr();
             }
             //console.log(media_id_arr);
-            mth_get_media_by_id(media_id_arr);
+            //mth_get_media_by_id(media_id_arr);
+            mth_homes_array.forEach(function(mth_home) {
+                var room_id = [];
+                for (var i = 0; i < mth_home.rooms.length; i++) {
+                    room_id.push(mth_home.id + '-' + i)
+                }
 
+                hidden_cal_selector = '#mth_hid_cal_input_' + mth_home.id;
+                mth_get_date_picker(room_id, true, hidden_cal_selector);
+            });
         }
     })(jQuery);
 }

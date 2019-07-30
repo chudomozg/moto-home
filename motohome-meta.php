@@ -44,10 +44,11 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 	//Комнаты
 	Field::make( 'complex', 'rooms', 'Комнаты МотоДома' )
 		->add_fields( array(
+                        Field::make( 'hidden', 'room_id', '' ),
 			Field::make( 'text', 'room_name', 'Название' )
-					->set_width( 33 ),
+					->set_width( 80 ),
 			Field::make( 'text', 'room_cost', 'Цена' )
-					->set_width( 10 ),
+					->set_width( 20 ),
 			
 		))
 		->set_visible_in_rest_api( true )

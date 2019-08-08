@@ -120,50 +120,117 @@ function mth_get_date_picker(room_id, is_front, selector) {
                 room_id: room_id,
             },
             success: function(data) {
-                //console.log('data');
-                //console.log(data);
+                console.log('calendar_data');
+                console.log(data);
                 var disable_date_arr = [];
+                var rooms = [];
                 if (Array.isArray(data) && (data.length > 0)) {
-                    for (var z = 0; z < data.length; z++) {
-                        if (z == 0) {
-                            data[z].booking_time.forEach(function(date_disable) {
+                    if (is_front == false) {
+                        for (var z = 0; z < data.length; z++) {
+                            if (z == 0) {
+                                data[z].booking_time.forEach(function(date_disable) {
+                                        if (date_disable.meta_value.includes('to')) {
+                                            var date_range_arr = date_disable.meta_value.split(' to ');
+                                            var date_range = {};
+                                            date_range.from = date_range_arr[0];
+                                            date_range.to = date_range_arr[1];
+                                            disable_date_arr.push(date_range);
+                                        } else {
+                                            disable_date_arr.push(date_disable.meta_value);
+                                        }
+                                    })
+                                    //console.log(disable_date_arr);
+                            }
+                        }
+
+                    }
+                    if (is_front == true) {
+                        var disable_arr = [];
+                        // переведем из строки в дату
+                        for (var z = 0; z < data.length; z++) {
+                            var room = [];
+                            if (data[z].booking_time.length > 0) {
+                                data[z].booking_time.forEach(function(date_disable) {
                                     if (date_disable.meta_value.includes('to')) {
                                         var date_range_arr = date_disable.meta_value.split(' to ');
                                         var date_range = {};
-                                        date_range.from = date_range_arr[0];
-                                        date_range.to = date_range_arr[1];
-                                        disable_date_arr.push(date_range);
+                                        date_range.from = moment(date_range_arr[0], 'DD.MM.YYYY').toDate();
+                                        date_range.to = moment(date_range_arr[1], 'DD.MM.YYYY').toDate();
+                                        room.push(date_range);
                                     } else {
-                                        disable_date_arr.push(date_disable.meta_value);
+                                        room.push(moment(date_disable.meta_value, 'DD.MM.YYYY').toDate());
                                     }
-                                })
-                                //console.log(disable_date_arr);
-                        } else {
-                            date_disable = data[z].booking_time;
-                            for (var g = 0; g < disable_date_arr.length; g++) {
-                                var delete_log = true;
-                                for (var h = 0; h < date_disable.length; h++) {
+                                });
+                            }
+                            rooms.push(room);
+                        }
+                        // console.log(rooms);
 
-                                    if (date_disable[h].meta_value.includes('to')) {
-                                        var date_range_arr = date_disable[h].meta_value.split(' to ');
-                                        var date_range = {};
-                                        date_range.from = date_range_arr[0];
-                                        date_range.to = date_range_arr[1];
+                        //комнаты
+                        for (var i = 0; i < rooms.length; i++) {
+                            // console.log('цикл № ' + i)
+
+                            if (i == 0) {
+                                //даты броней
+                                for (var z = 0; z < rooms[i].length; z++) {
+                                    //если диапозон создаем массив дат и закидываем в disable_arr
+                                    if ((rooms[i][z].hasOwnProperty('from')) == true) {
+                                        var range_arr = [];
+                                        var currentDate = moment(rooms[i][z].from);
+                                        var stopDate = moment(rooms[i][z].to);
+                                        while (currentDate <= stopDate) {
+                                            disable_arr.push(currentDate.toDate());
+                                            currentDate = moment(currentDate).add(1, 'days');
+                                        }
                                     } else {
-                                        var date_range = "";
-                                        date_range = date_disable[h].meta_value;
-                                    }
-                                    if (disable_date_arr[g] == date_range) {
-                                        delete_log = false;
+                                        //если просто дата закидываем в disable_arr
+                                        disable_arr.push(rooms[i][z]);
                                     }
                                 }
-                                if (delete_log == true) {
-                                    disable_date_arr.splice(h, 1);
+                            } else {
+                                //даты броней
+                                var range_arr = [];
+                                for (var z = 0; z < rooms[i].length; z++) {
+                                    //если диапозон дат создаем массив дат 
+                                    if ((rooms[i][z].hasOwnProperty('from')) == true) {
+                                        var currentDate = moment(rooms[i][z].from);
+                                        var stopDate = moment(rooms[i][z].to);
+                                        while (currentDate <= stopDate) {
+                                            range_arr.push(currentDate.toDate());
+                                            currentDate = moment(currentDate).add(1, 'days');
+                                        }
+                                    } else { //если дата одна 
+                                        range_arr.push(rooms[i][z]);
+                                    }
+                                }
+                                // console.log('range_arr');
+                                // console.log(range_arr);
+                                //удаляем несовпавшие даты
+                                for (var h = disable_arr.length - 1; h >= 0; h--) {
+                                    //Перебираем в обратном порядке Потому что при удалении через splice пересчитываются индексы и в обычном порядке пропустим элемент 
+                                    var delete_log = true;
+                                    for (var t = 0; t < range_arr.length; t++) {
+                                        //сравнивать даты нужно через .getTime()
+                                        // console.log(disable_arr[h] + '=?' + range_arr[t]);
+                                        if (disable_arr[h].getTime() == range_arr[t].getTime()) {
+                                            delete_log = false;
+                                        }
+                                    }
+                                    if (delete_log == true) {
+                                        // console.log('Удаляем ' + disable_arr[h]);
+                                        disable_arr.splice(h, 1);
+                                    }
                                 }
                             }
-                            //console.log(disable_date_arr);
+                            //console.log('disable_arr');
+                            //console.log(disable_arr);
                         }
+                        disable_date_arr = disable_arr;
                     }
+
+
+
+
                     var today = new Date();
                     //var disable_date_arr = ["30.07.2019", "29.07.2019", "28.07.2019"];
                     var optional_config = {
@@ -193,4 +260,15 @@ function mth_get_date_picker(room_id, is_front, selector) {
 
         });
     })(jQuery);
+}
+
+function mth_date_range_no_include(disable_date, date_compare_range) {
+    if ((typeof date_compare_range) == 'string') {
+        if ((disable_date.hasOwnProperty('from')) == true) {
+            if (moment(date_compare_range).isBetween(disable_date.from, disable_date.to)) {
+                return false;
+            }
+        }
+    }
+
 }

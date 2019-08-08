@@ -120,7 +120,7 @@ function mth_add_home_list(mth_homes_array) {
             });
             for (var i = 0; i < home_list_html.length; i++) {
                 $('.motohomeContentWrapper').append(home_list_html[i]);
-                $('#mth_list_cal-' + home_list_id[i]).clndr();
+                //$('#mth_list_cal-' + home_list_id[i]).clndr();
             }
             //console.log(media_id_arr);
             //mth_get_media_by_id(media_id_arr);

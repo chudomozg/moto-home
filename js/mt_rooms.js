@@ -254,7 +254,47 @@ function mth_get_date_picker(room_id, is_front, selector) {
                         optional_config.inline = true;
                     };
                     // $(".wp-admin.post-type-mt_booking .mth_booking_date_input .cf-field__body input").flatpickr(optional_config);
-                    $(selector).flatpickr(optional_config);
+                    //$(selector).flatpickr(optional_config);
+                    // var datepickopt = {
+                    //     inline: true,
+                    //     range: true,
+                    //     minDate: today,
+                    //     onRenderCell: function(date, cellType) {
+                    //         if (cellType == 'day' && isInArray(disable_date_arr, date)) {
+                    //             //alert(date);
+                    //             return {
+                    //                 classes: 'mth_disable_day',
+                    //                 disabled: true
+                    //             }
+                    //         }
+                    //     }
+                    // };
+                    //$(selector).datepicker(datepickopt);
+                    // var bootstrapdatepickoptinos = {
+                    //     inline: false,
+                    // };
+                    //$('.input-daterange').datetimepicker(bootstrapdatepickoptinos);
+                    var newselector = selector.substring(1, selector.length);
+                    console.log(newselector);
+                    var picker = new Lightpick({
+                        field: document.getElementById(newselector),
+                        inline: true,
+                        minDate: today,
+                        singleDate: false,
+                        lang: 'ru',
+                        format: 'DD.MM.YYYY',
+                        disabledDatesInRange: false,
+                        dropdowns: false,
+                        disableDates: disable_date_arr,
+                        onSelect: function(start, end) {
+                            var str = '';
+                            str += start ? start.format('DD.MM.YYYY') + ' to ' : '';
+                            str += end ? end.format('DD.MM.YYYY') : '...';
+                            document.querySelector(selector).innerHTML = str;
+                            // console.log(selector + "=" + str);
+                            // $(selector).val(str);
+                        }
+                    });
                 }
             }
 
@@ -271,4 +311,8 @@ function mth_date_range_no_include(disable_date, date_compare_range) {
         }
     }
 
+}
+
+function isInArray(array, value) {
+    return !!array.find(item => { return item.getTime() == value.getTime() });
 }

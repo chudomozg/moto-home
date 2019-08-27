@@ -90,40 +90,50 @@ function mth_add_home_list(mth_homes_array) {
             mth_homes_array.forEach(function(mth_home) {
                 console.log(mth_home);
                 var home_coords = mth_home.motohome_loc.split(", ").map(Number);
-                //console.log(mth_home.motohome_gallery);
+                console.log(mth_home.motohome_gallery);
                 //console.log(mth_get_media_by_id(mth_home.motohome_gallery));
 
+                var link = mth_home.link;
                 var media_html = '';
+                media_html += '<div class="owl-carousel">';
                 for (i = 0; i < mth_home.motohome_gallery.length; i++) {
-                    media_html += '<img src="" id="mth_list_img_' + mth_home.motohome_gallery[i] + '">';
+                    media_html += '<img src="' + plugin_url + 'img/no-image.png" class="mth_list_img" id="mth_list_img_' + mth_home.motohome_gallery[i] + '">';
                     media_id_arr.push(mth_home.motohome_gallery[i]);
                 }
-                var home_map = 'https://static-maps.yandex.ru/1.x/?ll=' + home_coords[1] + ',' + home_coords[0] + '&size=238,238&l=map&z=8&pt=' + home_coords[1] + ',' + home_coords[0] + ',pm2lbm';
+                media_html += '</div>';
+                var home_map = 'https://static-maps.yandex.ru/1.x/?ll=' + home_coords[1] + ',' + home_coords[0] + '&size=600,243&l=map&z=8&pt=' + home_coords[1] + ',' + home_coords[0] + ',pm2lbm';
                 var home_title = '<a href="' + mth_home.link + '">' + mth_home.title.rendered + '</a>';
                 var home_html = '' +
-                    '<div>' +
-                    '   <div class="mth_list_cal" id="mth_list_cal-' + mth_home.id + '">' +
-                    '   </div>' + '<input type="hidden" id="mth_hid_cal_input_' + mth_home.id + '">' +
-                    '   <div class="mth_minimap"><img src="' + home_map + '">' +
+                    '<div class="mth_list_unit_wrapper">' +
+                    '   <div class="mth_list_unit" id="mth_unit_' + mth_home.id + '">' +
+                    '       <div class="mth_list_cal" id="mth_list_cal-' + mth_home.id + '">' +
+                    '          <input type="hidden" id="mth_hid_cal_input_' + mth_home.id + '">' +
+                    '       </div>' +
+                    '       <div class="mth_minimap" onClick="mth_goto_map()"><img src="' + home_map + '">' +
+                    '       </div>' +
+                    '       <div class="mth_gallery_wrapper"><div class="mth_list_gallery">' + media_html +
+                    '       </div></div>' +
+                    '       <div class="mth_list_content articleTxt__box">' +
+                    '           <div class="articleTxt__header">' + home_title +
+                    '           </div>' +
+                    '           <div class="articleTxt__text">' + mth_home.excerpt.rendered +
+                    '           </div>' +
+                    '       </div>' +
                     '   </div>' +
-                    '   <div class="mth_list_gallery">' + media_html +
-                    '   </div>' +
-                    '   <div class="mth_list_content articleTxt__box">' +
-                    '      <div class="articleTxt__header">' + home_title +
-                    '      </div>' +
-                    '      <div class="articleTxt__text">' + mth_home.excerpt.rendered +
-                    '      </div>' +
+                    '   <div class="motohomeHeaderWrapper">' +
+                    '       <div class="motohomeHeader">' +
+                    '           <div class="settings__rowCenter settings__rowCenter--motohome">' +
+                    '               <div class="mth_button_wrapper settings__calculateBtnWrapper">' +
+                    '                   <button onclick="location.href =\'' + link + '\'" class="settings__calculateBtn mth_home_button">Забронировать' +
+                    '                   </button>' +
+                    '               </div>' +
+                    '           </div>' +
+                    '       </div>' +
                     '   </div>' +
                     '</div>';
                 home_list_html.push(home_html);
                 home_list_id.push(mth_home.id);
             });
-            for (var i = 0; i < home_list_html.length; i++) {
-                $('.motohomeContentWrapper').append(home_list_html[i]);
-                //$('#mth_list_cal-' + home_list_id[i]).clndr();
-            }
-            //console.log(media_id_arr);
-            //mth_get_media_by_id(media_id_arr);
             mth_homes_array.forEach(function(mth_home) {
                 var room_id = [];
                 for (var i = 0; i < mth_home.rooms.length; i++) {
@@ -133,6 +143,33 @@ function mth_add_home_list(mth_homes_array) {
                 hidden_cal_selector = '#mth_hid_cal_input_' + mth_home.id;
                 mth_get_date_picker(room_id, true, hidden_cal_selector);
             });
+            for (var i = 0; i < home_list_html.length; i++) {
+                $('.motohomeContentWrapper').append(home_list_html[i]);
+                //$('#mth_list_cal-' + home_list_id[i]).clndr();
+            }
+            //console.log(media_id_arr);
+            mth_get_media_by_id(media_id_arr);
+            $(".owl-carousel").owlCarousel({
+                //loop: true,
+                dots: true,
+                items: 1,
+                margin: 17,
+                lazyLoad: true,
+                mergeFit: true,
+                responsive: {
+                    0: {
+                        items: 1,
+                    },
+                    800: {
+                        items: 1,
+                    },
+                    1200: {
+                        items: 1,
+                    },
+
+                }
+            });
+
         }
     })(jQuery);
 }
@@ -151,4 +188,9 @@ function mth_get_media_by_id(id_arr) {
             }
         });
     }
+}
+
+function mth_goto_map() {
+    window.location.href = "#map";
+    window.scrollBy(0, -180);
 }

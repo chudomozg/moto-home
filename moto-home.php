@@ -309,12 +309,20 @@ function mthome_ad_yascript_add_front( $hook ){
 		wp_enqueue_script('mt_rooms.js', plugins_url('moto-home/js/mt_rooms.js'));
 		wp_enqueue_script('mt_home_front.js', plugins_url('moto-home/js/mt_home_front.js'), array('jquery', 'mt_rooms.js'));
 		wp_localize_script( 'mt_home_front.js', 'site_url', get_site_url());
+		wp_localize_script( 'mt_home_front.js', 'plugin_url', plugins_url('moto-home/'));
 		wp_enqueue_script('moment.min.js', plugins_url('moto-home/js/moment.min.js'), array('jquery'));
 		wp_enqueue_script('moment-locale', plugins_url('moto-home/js/ru.js'), array('jquery', 'moment.min.js'));
-		wp_enqueue_script('underscore-min.js', plugins_url('moto-home/js/underscore-min.js'), array('jquery'));
-		wp_enqueue_script('clndr.js', plugins_url('moto-home/js/clndr.js'), array('jquery', 'moment.min.js', 'underscore-min.js'));
-		wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr');
-		wp_enqueue_style('flatpickr.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css');
+		// wp_enqueue_script('underscore-min.js', plugins_url('moto-home/js/underscore-min.js'), array('jquery'));
+		wp_enqueue_script('owl.carousel.min.js', plugins_url('moto-home/js/owl.carousel.min.js'), array('jquery'));
+		wp_enqueue_script('lightpick.js', plugins_url('moto-home/js/lightpick.js'), array('jquery', 'moment.min.js'));
+		// wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr');
+		wp_enqueue_script('fotorama.js', 'https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js');
+		wp_enqueue_style('fotorama.css', 'https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css');
+		// wp_enqueue_style('flatpickr.css', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css');
+		wp_enqueue_style('main.css', plugins_url('moto-home/css/main.css'));
+		wp_enqueue_style('owl.carousel.css', plugins_url('moto-home/assets/owl.carousel.css'));
+		wp_enqueue_style('lightpick.css', plugins_url('moto-home/css/lightpick.css'));
+		wp_enqueue_style('owl.theme.default.css', plugins_url('moto-home/assets/owl.theme.default.css'));
 		//wp_enqueue_media();
 	}
 	
@@ -395,15 +403,20 @@ function mth_set_city_to_taxonomy(){
 	}
 }
 
-//add_action('save_post_mt_booking', 'mth_id_to_title');
-add_filter( 'wp_insert_post_data' , 'mth_id_to_title' , '99', 1 );
-
-function mth_id_to_title($data){
-	if ($data['post_type']=='mt_booking'){
-		$data['post_title'] = $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
-		return $data;
+//Создаем id брони в title
+function mth_id_to_title($post_id ){
+	$post_type = 'mt_booking';
+	if (get_post_type($post_id) == $post_type){
+		global $wpdb;
+		$title =  $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
+		$wpdb->update( $wpdb->posts, array( 'post_title' =>  $title ), array( 'ID' => $post_id ) );	
 	}
 }
+	
+add_action('save_post', 'mth_id_to_title');
+
+
+
 
 
 add_action( 'wp_ajax_mth_get_term_to_hid_city_inp', 'mth_get_term_to_hid_city_inp' );

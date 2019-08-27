@@ -64,17 +64,21 @@ function mth_yamap_add_city_collection(mth_homes_array) {
     if (mth_homes_array.length) {
         mth_homes_array.forEach(function(mth_home) {
             //console.log(mth_home);
+            var placemark;
             var mth_cord = mth_home.motohome_loc.split(',').map(parseFloat);
-            mthCollectionArray.add(new ymaps.Placemark(mth_cord, {
-                balloonContent: mth_home.title.rendered
+            mthCollectionArray.add(placemark = new ymaps.Placemark(mth_cord, {
+                balloonContent: mth_home.title.rendered,
             }));
+            placemark.events.add(['click'], function(e) {
+                // Ваш код
+                window.location.href = `#mth_unit_${mth_home.id}`
+                window.scrollBy(0, -90);
+            });
         });
 
+        //console.log(mthCollectionArray);
         myMap.geoObjects.add(mthCollectionArray);
         myMap.setBounds(mthCollectionArray.getBounds(), { zoomMargin: 100 });
     }
 
-
-    // mthCoords
-    //mthCollection = new ymaps.GeoObjectCollection();
 };

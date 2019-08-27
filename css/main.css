@@ -1,0 +1,407 @@
+﻿.mth_front_gallery_wrapper {
+    width: 45%;
+}
+
+.mth_minimap {
+    cursor: pointer;
+}
+
+.lightpick {
+    font-family: Roboto Regular !important;
+    padding: 0px !important;
+    z-index: 1 !important;
+}
+
+.lightpick select {
+    background-image: none;
+}
+
+.single .flatpickr-input {
+    display: none;
+}
+
+.mth_list_gallery .owl-carousel {
+    max-width: 100% !important;
+    height: 243px !important;
+}
+
+.mth_list_gallery .owl-carousel img {
+    height: 243px;
+    object-fit: cover;
+}
+
+.mth_list_gallery .owl-carousel .owl-dots {
+    position: relative;
+    top: -28px;
+    text-align: center;
+}
+
+.mth_list_gallery .owl-carousel .owl-dots .owl-dot span {
+    border-radius: 5px;
+    height: 10px !important;
+    width: 10px !important;
+    background-color: #fff;
+    border: none;
+    margin: 5px 3px;
+    display: block !important;
+    position: inherit !important;
+}
+
+.mth_list_gallery .owl-carousel .owl-dots .owl-dot.active span {
+    background-color: #1ebbf0;
+}
+
+.single .flatpickr-month {
+    background-color: #333;
+    color: #fff;
+}
+
+.single .lightpick .lightpick__month-title-bar {
+    display: block;
+    justify-content: inherit;
+    margin-bottom: 0px;
+}
+
+.single .lightpick .lightpick__month-title {
+    top: -5px;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    width: 60%;
+}
+
+.single .lightpick .lightpick__toolbar {
+    display: flex;
+    background: #333;
+    justify-content: space-between;
+}
+
+.single .lightpick .lightpick__toolbar .lightpick__previous-action,
+.single .lightpick .lightpick__toolbar .lightpick__next-action {
+    margin-left: 0px;
+    border-radius: none;
+    border-radius: 0%;
+    background-color: #333;
+    color: #333 !important;
+    height: 34px;
+}
+
+.single .lightpick__month-title>.lightpick__select:disabled {
+    color: #fff;
+}
+
+.single .lightpick .lightpick__toolbar .lightpick__previous-action::after,
+.single .lightpick .lightpick__toolbar .lightpick__next-action::before {
+    content: " ";
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.single .lightpick .lightpick__toolbar .lightpick__next-action::before {
+    border-left: 10px solid #fff;
+}
+
+.single .lightpick .lightpick__toolbar .lightpick__previous-action::after {
+    border-right: 10px solid #fff;
+}
+
+.lightpick__days-of-the-week {
+    background: #1ebbf0;
+    color: #fff;
+}
+
+.single .lightpick__day.is-today {
+    background-image: none;
+    background: #333;
+    background-size: auto;
+    background-position: center bottom;
+    color: #fff;
+}
+
+.single .lightpick__day.is-today:hover {
+    background-image: none;
+}
+
+.single .lightpick__day.is-start-date.is-in-range,
+.single .lightpick__day.is-end-date.is-in-range,
+.single .lightpick__day.is-end-date.is-in-range.is-flipped,
+.single .lightpick__day.is-start-date.is-in-range.is-flipped {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    background-image: none;
+    background-color: #1ebbf0;
+    color: #fff;
+}
+
+.single .lightpick__day.is-in-range {
+    background-color: rgba(30, 187, 240, 0.2);
+}
+
+.single .lightpick__day {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    height: 33px;
+}
+
+.single .lightpick__day:hover {
+    /* background: inherit !important; */
+}
+
+.single .lightpick__day-of-the-week {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 2.5;
+}
+
+.single .lightpick__month {
+    padding: 0px;
+    width: 243px;
+}
+
+.mth_list_unit {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.mth_list_unit>div {
+    margin: 0 15px;
+}
+
+.mth_list_unit>div.mth_list_cal {
+    margin-left: 0px;
+}
+
+.mth_list_unit>div.mth_list_content {
+    margin-right: 0px;
+    height: 243px;
+    display: block;
+    /* flex-wrap: wrap; */
+    overflow: hidden;
+}
+
+.mth_list_gallery {
+    width: 243px;
+}
+
+.articleTxt__header {
+    background: #333;
+    color: #fff;
+    padding: 8px 15px;
+    font-size: 22px;
+    width: 100%;
+}
+
+.articleTxt__header a,
+.articleTxt__header a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.articleTxt__text {
+    height: 100%;
+    background: #f2f2f2;
+    padding: 15px
+}
+
+.motohomeContentMap {
+    margin: 35px 0px;
+}
+
+.settings__calculateBtn {
+    text-align: center;
+    font-size: 17px;
+    background: #1ebbf0;
+    color: #fff;
+    border: none;
+    padding: 7px 0;
+    width: 230px;
+    border-radius: 17px;
+    transition: all .3s ease-out;
+}
+
+.motohomeHeader {
+    height: 5px;
+    position: relative;
+    box-shadow: 0 3px 5px 0 hsla(0, 0%, 90%, .23);
+}
+
+.settings__rowCenter--motohome {
+    position: absolute;
+    left: 50%;
+    top: -15px;
+    margin-left: -115px;
+}
+
+.settings__rowCenter {
+    padding-top: 5px;
+}
+
+.settings__calculateBtnWrapper {
+    text-align: center;
+}
+
+.motohomeHeaderWrapper {
+    margin: 40px 0 65px
+}
+
+.mth_minimap img {
+    width: 243px;
+    object-fit: cover;
+    height: 243px;
+    object-fit: cover;
+}
+
+@media (max-width:1200px) {
+    .mth_minimap img {
+        width: 410px;
+        height: 243px;
+    }
+    .mth_list_unit {
+        flex-wrap: wrap-reverse;
+    }
+    .single .lightpick__month {
+        width: 410px;
+    }
+    /* .single .lightpick .lightpick__month-title {
+        right: 150px;
+    } */
+    .mth_list_gallery {
+        width: 410px;
+    }
+    .mth_list_gallery .owl-carousel {
+        height: 410px !important;
+    }
+    .mth_list_gallery .owl-carousel img {
+        width: 410px;
+        height: 410px;
+        object-fit: cover;
+    }
+    .mth_list_unit>div.mth_list_content {
+        width: 410px;
+        margin-right: 0px;
+        height: 410px;
+    }
+    .mth_list_unit>div {
+        margin: 20px auto;
+    }
+    .mth_minimap {
+        margin-right: 0px !important;
+    }
+    .mth_gallery_wrapper {
+        margin-left: 0px !important;
+    }
+}
+
+@media (max-width:1000px) {
+    .mth_minimap img {
+        width: 306px;
+        height: 243px;
+    }
+    .single .lightpick__month {
+        width: 306px;
+    }
+    /* .single .lightpick .lightpick__month-title {
+        right: 100px;
+    } */
+    .mth_list_gallery {
+        width: 306px;
+    }
+    .mth_list_gallery .owl-carousel {
+        height: 306px !important;
+    }
+    .mth_list_gallery .owl-carousel img {
+        width: 306px;
+        height: 306px;
+    }
+    .mth_list_unit>div.mth_list_content {
+        width: 306px;
+        height: 306px;
+    }
+    .mth_list_unit>div {
+        margin: 20px auto;
+    }
+}
+
+@media (max-width:1000px) {
+    .mth_minimap img {
+        width: 225px;
+        height: 225px;
+    }
+    .single .lightpick__month {
+        width: 225px;
+    }
+    /* .single .lightpick .lightpick__month-title {
+        right: 100px;
+    } */
+    .mth_list_gallery {
+        width: 225px;
+    }
+    .mth_list_gallery .owl-carousel {
+        height: 225px !important;
+    }
+    .mth_list_gallery .owl-carousel img {
+        width: 225px;
+        height: 225px;
+    }
+    .mth_list_unit>div.mth_list_content {
+        width: 225px;
+        height: 225px;
+    }
+    .mth_list_unit>div {
+        margin: 20px auto;
+    }
+}
+
+@media (max-width:600px) {
+    .mth_minimap img {
+        width: 100%;
+        height: auto;
+    }
+    .single .lightpick__month {
+        width: 100%;
+    }
+    /* .single .lightpick .lightpick__month-title {
+        right: 125px;
+    } */
+    .mth_list_gallery {
+        width: 100%;
+        max-width: 450px;
+        margin: auto;
+    }
+    .mth_gallery_wrapper {
+        width: 100%;
+        margin: 20px 0 !important;
+        text-align: center;
+    }
+    .mth_list_gallery .owl-carousel {
+        height: 100% !important;
+        max-height: 450px;
+    }
+    .mth_list_gallery .owl-carousel img {
+        /* width: 100%; */
+        height: 100%;
+        max-height: 450px;
+    }
+    .mth_list_unit>div.mth_list_content {
+        width: 100%;
+        /* height: auto; */
+    }
+    .mth_list_unit>div {
+        margin: 20px auto;
+        /* width: 100%; */
+    }
+    .mth_list_cal {
+        width: 100%;
+    }
+    .lightpick {
+        width: 100%;
+    }
+}
+
+ma

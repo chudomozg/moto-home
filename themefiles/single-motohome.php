@@ -44,15 +44,17 @@ get_header(); ?>
                 print_r( $data_arr );
                 ?>
             </div>
-            <div class="mth_front_gallery"> 
-                <h4 class="mth_front_gallery_title mth_title">Фотографии</h4>
-                <?php $slides = carbon_get_post_meta(get_the_ID(), 'motohome_gallery');
-                    foreach ($slides as $slide):
-                ?>
-                    <img src="<?php echo wp_get_attachment_image_url($slide); ?>" alt="Image">
-                <?php endforeach; 
-                ?>
+            <div class="mth_front_gallery_wrapper">
+                <div class="mth_front_gallery fotorama"  data-nav="thumbs" data-width="100%"  data-ratio="1/1">  
+                    <?php $slides = carbon_get_post_meta(get_the_ID(), 'motohome_gallery');
+                        foreach ($slides as $slide):
+                    ?>
+                        <a href="<?php echo wp_get_attachment_image_url($slide, "full"); ?>"><img src="<?php echo wp_get_attachment_image_url($slide, "full"); ?>" alt="Image"></a>
+                    <?php endforeach; 
+                    ?>
+                </div>
             </div>
+            
            <div class="mth_front_city">
                <div class="mth_front_city_title mth_title">
                    Город:

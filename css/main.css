@@ -1,5 +1,26 @@
-﻿.mth_front_gallery_wrapper {
-    width: 45%;
+﻿.single-motohome .mth_main_content {
+    /* display: flex; */
+}
+
+.mth_desc {
+    margin: 50px 0;
+}
+
+.mth_flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.single-motohome .mth_front_map {
+    width: 47%;
+}
+
+.single-motohome .wf-container-main {
+    display: block !important;
+}
+
+.mth_front_gallery_wrapper {
+    width: 47%;
 }
 
 .mth_minimap {

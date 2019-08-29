@@ -228,73 +228,51 @@ function mth_get_date_picker(room_id, is_front, selector) {
                         disable_date_arr = disable_arr;
                     }
 
-
-
+                    //Вывод календаря
 
                     var today = new Date();
-                    //var disable_date_arr = ["30.07.2019", "29.07.2019", "28.07.2019"];
-                    var optional_config = {
-                        dateFormat: "d.m.Y",
-                        minDate: today,
-                        disable: disable_date_arr,
-                        mode: "range",
-                        locale: {
-                            firstDayOfWeek: 1,
-                            weekdays: {
-                                shorthand: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-                                longhand: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                    if (is_front) { //на Сайте
+                        var newselector = selector.substring(1, selector.length);
+                        console.log(newselector);
+                        var picker = new Lightpick({
+                            field: document.getElementById(newselector),
+                            inline: true,
+                            minDate: today,
+                            singleDate: false,
+                            lang: 'ru',
+                            format: 'DD.MM.YYYY',
+                            disabledDatesInRange: false,
+                            dropdowns: false,
+                            disableDates: disable_date_arr,
+                            onSelect: function(start, end) {
+                                var str = '';
+                                str += start ? start.format('DD.MM.YYYY') + ' to ' : '';
+                                str += end ? end.format('DD.MM.YYYY') : '...';
+                                document.querySelector(selector).innerHTML = str;
+                                // console.log(selector + "=" + str);
+                                // $(selector).val(str);
+                            }
+                        });
+                    } else if (!is_front) { //В админке
+                        var optional_config = {
+                            dateFormat: "d.m.Y",
+                            minDate: today,
+                            disable: disable_date_arr,
+                            mode: "range",
+                            locale: {
+                                firstDayOfWeek: 1,
+                                weekdays: {
+                                    shorthand: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                                    longhand: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                                },
+                                months: {
+                                    shorthand: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                                    longhand: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                                },
                             },
-                            months: {
-                                shorthand: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                                longhand: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-                            },
-                        },
-                    };
-                    if (is_front == true) {
-                        optional_config.inline = true;
-                    };
-                    // $(".wp-admin.post-type-mt_booking .mth_booking_date_input .cf-field__body input").flatpickr(optional_config);
-                    //$(selector).flatpickr(optional_config);
-                    // var datepickopt = {
-                    //     inline: true,
-                    //     range: true,
-                    //     minDate: today,
-                    //     onRenderCell: function(date, cellType) {
-                    //         if (cellType == 'day' && isInArray(disable_date_arr, date)) {
-                    //             //alert(date);
-                    //             return {
-                    //                 classes: 'mth_disable_day',
-                    //                 disabled: true
-                    //             }
-                    //         }
-                    //     }
-                    // };
-                    //$(selector).datepicker(datepickopt);
-                    // var bootstrapdatepickoptinos = {
-                    //     inline: false,
-                    // };
-                    //$('.input-daterange').datetimepicker(bootstrapdatepickoptinos);
-                    var newselector = selector.substring(1, selector.length);
-                    console.log(newselector);
-                    var picker = new Lightpick({
-                        field: document.getElementById(newselector),
-                        inline: true,
-                        minDate: today,
-                        singleDate: false,
-                        lang: 'ru',
-                        format: 'DD.MM.YYYY',
-                        disabledDatesInRange: false,
-                        dropdowns: false,
-                        disableDates: disable_date_arr,
-                        onSelect: function(start, end) {
-                            var str = '';
-                            str += start ? start.format('DD.MM.YYYY') + ' to ' : '';
-                            str += end ? end.format('DD.MM.YYYY') : '...';
-                            document.querySelector(selector).innerHTML = str;
-                            // console.log(selector + "=" + str);
-                            // $(selector).val(str);
-                        }
-                    });
+                        };
+                        $(selector).flatpickr(optional_config);
+                    }
                 }
             }
 

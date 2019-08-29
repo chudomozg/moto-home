@@ -11,7 +11,8 @@ function init() {
     //создаем карту
     myMap = new ymaps.Map('map', {
         center: [55.753994, 37.622093],
-        zoom: 12
+        zoom: 12,
+        autoFitToViewport: 'always',
     }, {
         searchControlProvider: 'yandex#search'
     });

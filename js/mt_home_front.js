@@ -14,9 +14,48 @@
 
         }
 
+        //Подгружаем календари
+        if ($('.single-motohome .mth_list_cal').length) {
+            $('.single-motohome .mth_list_cal .mth_hid_cal_input').each(function(indx, element) {
+                var room_id = ($(element).attr('id'));
+                var cal_id = room_id.replace("mth_hid_cal_input_", "");
+                room_id = "#" + room_id;
+                // console.log(cal_id);
+                // console.log(room_id);
+                mth_get_date_picker([cal_id], true, room_id);
+            });
+        }
+
+        //отправляем форму брони
+        $('.mth_home_submit_button').on("click", function(event) {
+            event.preventDefault();
+            var form = $(this).attr('form');
+            var mth_date = $('#' + form + ' .mth_hid_cal_input').val();
+            var room_id = $('#' + form + ' .mth_hid_room_id_input').val();
+
+            $.ajax({
+                url: site_url + '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data_type: 'json',
+                data: {
+                    action: 'mth_user_create_reserv',
+                    date: mth_date,
+                    room_id: room_id,
+                },
+                success: function(data) {
+                    // rooms_to_select(data);
+                    console.log(data);
+                    alert("Ваша заявка отправлена, вскоре с вами свяжется менеджер для подтверждения брони. Обратите внимание, что до подтверждения брони, она не отображается на сайте. Спасибо за использование moto-tours.me")
+                }
+            });
+
+
+        })
+
     });
 })(jQuery);
 
+//Динамический select городов
 function mth_get_option_city_select(parent_id) {
     (function($) {
         $('#wp_cn_front_city_select > option').remove();

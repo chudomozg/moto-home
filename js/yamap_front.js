@@ -4,7 +4,19 @@
     $(document).ready(function() {
         ymaps.ready(init);
     });
+
+    $(window).resize(function() {
+        var map_height = '300px';
+        // var map_height = (screen.width > 900) ? ($('.fotorama').css('height')) : ('300px');
+        if (document.body.clientWidth > 883) {
+            map_height = $('.fotorama').css('height');
+        }
+        $('#map').css('height', map_height);
+        myMap.container.fitToViewport();
+    });
+
 })(jQuery);
+
 
 function init() {
 
@@ -20,8 +32,8 @@ function init() {
     //если на странице всех мотодомов
     if (document.querySelector('.mth_page_all_motohome')) {
         var mth_city_all = document.querySelector('#wp_cn_front_city_select').value;
-        //console.log(mth_city_all);
-        var mth_homes_array = mth_get_homes(mth_city_all);
+        //console.log(mth_city_all);s
+        mth_get_homes(mth_city_all);
 
     }
 
@@ -34,7 +46,7 @@ function init() {
             if (mthome_tinput.value) {
                 coords_from_input = mthome_tinput.value.split(", ").map(Number);
                 //console.log(coords_from_input);
-                var mth_home_title = document.querySelector('.site-main .entry-title').innerHTML;
+                var mth_home_title = document.querySelector('.single-motohome .entry-title').innerHTML;
             } else {
                 coords_from_input = [55.753994, 37.622093];
                 console.log("Ошибка загрузки метки");
@@ -48,7 +60,8 @@ function init() {
                 balloonContent: mth_home_title
             }, {
                 preset: 'islands#dotIcon',
-                iconColor: '#23afe5'
+                iconColor: '#23afe5',
+                iconImageSize: [200, 200],
             }));
 
         }

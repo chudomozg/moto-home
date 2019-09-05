@@ -40,7 +40,7 @@
     })
 })(jQuery);
 
-//функция получения ID и отправка AJAX запроса к REST
+//функция получения ID и отправка AJAX запроса
 function mth_get_room(room_id) {
     (function($) {
         //берем из строки данные о загруженном Мотодоме в поле ассоциации
@@ -107,9 +107,6 @@ function rooms_to_select(data) {
 
 function mth_get_date_picker(room_id, is_front, selector) {
     //console.log(room_id);
-    // if (is_front == false) {
-    //     room_id = room_ids[0];
-    // }
     (function($) {
         $.ajax({
             url: site_url + '/wp-admin/admin-ajax.php',
@@ -120,12 +117,13 @@ function mth_get_date_picker(room_id, is_front, selector) {
                 room_id: room_id,
             },
             success: function(data) {
-                console.log('calendar_data');
-                console.log(data);
+                // console.log('calendar_data');
+                // console.log(data);
                 var disable_date_arr = [];
                 var rooms = [];
+                // Выборка забронированных дат////////////////////////////////////////////////////
                 if (Array.isArray(data) && (data.length > 0)) {
-                    if (is_front == false) {
+                    if (is_front == false) { //В админке
                         for (var z = 0; z < data.length; z++) {
                             if (z == 0) {
                                 data[z].booking_time.forEach(function(date_disable) {
@@ -144,7 +142,7 @@ function mth_get_date_picker(room_id, is_front, selector) {
                         }
 
                     }
-                    if (is_front == true) {
+                    if (is_front == true) { // на Сайте
                         var disable_arr = [];
                         // переведем из строки в дату
                         for (var z = 0; z < data.length; z++) {
@@ -233,7 +231,7 @@ function mth_get_date_picker(room_id, is_front, selector) {
                     var today = new Date();
                     if (is_front) { //на Сайте
                         var newselector = selector.substring(1, selector.length);
-                        console.log(newselector);
+                        // console.log(newselector);
                         var picker = new Lightpick({
                             field: document.getElementById(newselector),
                             inline: true,

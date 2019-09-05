@@ -48,7 +48,10 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
 			Field::make( 'text', 'room_name', 'Название' )
 					->set_width( 80 ),
 			Field::make( 'text', 'room_cost', 'Цена' )
-					->set_width( 20 ),
+                                        ->set_width( 20 ),
+                        Field::make( 'textarea', 'room_desc', 'Описание' )
+                                        ->set_rows( 5 )
+                                        ->set_attribute( 'maxLength', 485 )
 			
 		))
 		->set_visible_in_rest_api( true )

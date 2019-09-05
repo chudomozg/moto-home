@@ -2,6 +2,46 @@
     /* display: flex; */
 }
 
+.single-motohome .motohomeHeaderWrapper {
+    margin: 35px 0 65px;
+}
+
+.single-motohome.single .lightpick__month {
+    width: 243px;
+}
+
+.mth_room_unit {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.single-motohome .articleTxt__header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.single-motohome .mth_list_content {
+    margin: 0 0 0 50px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.single-motohome .articleTxt__text {
+    height: 100%;
+    padding-bottom: 40px;
+}
+
+.single-motohome .articleTxt__header {
+    padding: 0;
+}
+
+.single-motohome .articleTxt__header .mth_room_title,
+.single-motohome .articleTxt__header .mth_room_coast {
+    padding: 6px 15px;
+    font-size: 16px;
+}
+
 .mth_desc {
     margin: 50px 0;
 }
@@ -347,9 +387,6 @@
     .mth_list_unit>div {
         margin: 20px auto;
     }
-}
-
-@media (max-width:1000px) {
     .mth_minimap img {
         width: 225px;
         height: 225px;
@@ -376,6 +413,51 @@
     }
     .mth_list_unit>div {
         margin: 20px auto;
+    }
+    .single.single-motohome .lightpick__day {
+        height: 39px;
+    }
+    .single-motohome.single .lightpick__month {
+        width: 278px;
+    }
+}
+
+@media (max-width:900px) {
+    .single-motohome .mth_flex {
+        display: block;
+        justify-content: unset;
+    }
+    .single-motohome .mth_front_gallery_wrapper {
+        width: 100%;
+        margin-bottom: 40px;
+    }
+    .single-motohome .mth_front_map {
+        width: 100%;
+    }
+    .single-motohome .wf-wrap {
+        padding: 0 150px;
+    }
+    .single-motohome .mth_front_map {
+        height: 300px;
+    }
+    .single-motohome .mth_room_unit {
+        display: flex;
+        justify-content: unset;
+        margin-bottom: 40px;
+        flex-wrap: wrap-reverse;
+    }
+    .single-motohome .mth_list_content {
+        margin: 0;
+    }
+    .single-motohome .mth_list_cal {
+        width: 100%;
+        margin-top: 40px;
+    }
+    .single-motohome .lightpick {
+        width: 100%;
+    }
+    .single-motohome.single .lightpick__month {
+        width: 100%;
     }
 }
 
@@ -424,5 +506,3 @@
         width: 100%;
     }
 }
-
-ma

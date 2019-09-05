@@ -230,6 +230,63 @@ add_action( 'wp_ajax_mth_select_update', 'mth_select_update' );
 add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' ); //проверить будет ли работать без нее с правами на опр польз
 
 
+//Создание брони пользователем сайта
+function mth_user_create_reserv(){
+	$room_id =  $_POST['room_id'];
+	$motohome_id = substr($room_id, 0, strpos($room_id, "-"));
+	$reserv_date =  $_POST['date'];
+	$response = [$room_id,$reserv_date];
+	global $wpdb;
+	
+
+	// Создаем массив данных новой записи
+	$post_data = array(
+		'post_title'    => wp_strip_all_tags($room_id."-???"),
+		'post_content'  =>	'',
+		'post_status'   => 'publish',
+		'post_author'   => get_current_user_id(),
+		'post_type' => 'mt_booking',
+	);
+
+	// Вставляем запись в базу данных
+	$post_id = wp_insert_post( $post_data );
+
+	//Добавляем значение meta полей в БД
+	// $table =$wpdb->prefix.'postmeta';
+	// //Дата бронирования
+	// $data=array('post_id'=>$post_id, 'meta_key'=>'_mth_bookdate', 'meta_value'=>$reserv_date);
+	// $format = array('%d', '%s', '%s');
+	// $wpdb->insert( $table, $data, $format );
+
+	//Дата бронирования
+	carbon_set_post_meta( $post_id, 'mth_bookdate', $reserv_date );
+	//id комнаты
+	carbon_set_post_meta( $post_id, 'mth_rooms_select_hidden', $room_id );
+	//Статус брони
+	carbon_set_post_meta( $post_id, 'mth_stat_select', 'received' );
+	//Какая комната assoc
+	$mth_assoc = array( 
+		0 => array(
+			'id' => $motohome_id,
+			'type' => 'post',
+			'subtype' => 'motohome',
+			'value' => 'post:motohome:'.$motohome_id,
+		));
+	carbon_set_post_meta( $post_id, 'mth_assoc', $mth_assoc );
+
+	//обновляем title post mt_booking
+	$booking_post = array();
+	$booking_post['ID']=$post_id;
+	$booking_post["post_title"]=$room_id."-".$post_id;
+	wp_update_post( wp_slash($booking_post) );
+
+
+	wp_send_json(array ($post_id, $motohome_id));
+}
+
+add_action( 'wp_ajax_mth_user_create_reserv', 'mth_user_create_reserv' );
+add_action( 'wp_ajax_nopriv_mth_user_create_reserv', 'mth_user_create_reserv' );
+
 function mth_date_picker_get_booking_time(){
 	if (isset($_POST['room_id'])){
 		$room_ids = $_POST['room_id'];
@@ -238,7 +295,9 @@ function mth_date_picker_get_booking_time(){
 		foreach ($room_ids as $room_id){
 			$booking_times =[];
 			$stack =[];
-			$sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'")';
+			//Старая версия запроса без статуса брони 
+			// $sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'")';
+			$sql = 'SELECT meta_value FROM wp_postmeta WHERE meta_key= "_mth_bookdate" AND post_id IN (SELECT post_id FROM wp_postmeta WHERE meta_key = "_mth_rooms_select_hidden" AND meta_value = "'.$room_id.'") AND post_id NOT IN (SELECT post_id FROM wp_postmeta WHERE meta_key= "_mth_stat_select" AND meta_value="received") AND post_id NOT IN (SELECT post_id FROM wp_postmeta WHERE meta_key= "_mth_stat_select" AND meta_value="canceled")';
 			//ChromePhp::log($sql); 
 			$sql_request =  $wpdb->get_results($sql);
 			if ($sql_request){
@@ -407,9 +466,11 @@ function mth_set_city_to_taxonomy(){
 function mth_id_to_title($post_id ){
 	$post_type = 'mt_booking';
 	if (get_post_type($post_id) == $post_type){
-		global $wpdb;
-		$title =  $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
-		$wpdb->update( $wpdb->posts, array( 'post_title' =>  $title ), array( 'ID' => $post_id ) );	
+		if (isset($_POST['post_ID'])&&isset($_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden'])){
+			global $wpdb;
+			$title =  $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
+			$wpdb->update( $wpdb->posts, array( 'post_title' =>  $title ), array( 'ID' => $post_id ) );	
+		}
 	}
 }
 	

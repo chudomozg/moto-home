@@ -88,27 +88,37 @@ function rooms_to_select(data) {
         //добавляем новые
         $(select).append(rooms_html);
 
-        //Если что-то уже было сохранено, загружаем.
+        var room_id = [];
+        var hid_selected_date = "";
+        var date_input = 'input[name="carbon_fields_compact_input[_mth_bookdate]"]';
+
+        //Если была сохранена дата (не пустая строка)
+        if ($(date_input).val()) {
+            hid_selected_date = $(date_input).val();
+        }
+
+        //Если комната уже была выбрана и сохранена, загружаем.
         var hidden_input = 'input[name="carbon_fields_compact_input[_mth_rooms_select_hidden]"]';
         if ($(hidden_input).val() != "") {
             var hidden_input_val = $(hidden_input).val();
             $(select).val(hidden_input_val);
+            room_id.push(hidden_input_val);
+            //Если нет то присваеваем везде значение первой опции селекта
         } else {
             $(hidden_input).attr('value', rooms[0].id);
             $(select + ' [value="' + rooms[0].id + '"]').attr("selected", "selected");
+            room_id.push(rooms[0].id);
         }
-        //меняем value hidden input
+
         //DatePicker
-        var room_id = [];
-        room_id.push(rooms[0].id);
         var selector = '.wp-admin.post-type-mt_booking .mth_booking_date_input .cf-field__body input';
-        mth_get_date_picker(room_id, false, selector);
+        mth_get_date_picker(room_id, false, selector, hid_selected_date);
     })(jQuery);
 
 }
 
 function mth_get_date_picker(room_id, is_front, selector, selected_date = "") {
-    //console.log(room_id);
+    console.log(room_id);
     (function($) {
         $.ajax({
             url: site_url + '/wp-admin/admin-ajax.php',
@@ -128,18 +138,37 @@ function mth_get_date_picker(room_id, is_front, selector, selected_date = "") {
                     if (is_front == false) { //В админке
                         for (var z = 0; z < data.length; z++) {
                             if (z == 0) {
+                                //формируем массив dissable date
                                 data[z].booking_time.forEach(function(date_disable) {
-                                        if (date_disable.meta_value.includes('to')) {
-                                            var date_range_arr = date_disable.meta_value.split(' to ');
-                                            var date_range = {};
-                                            date_range.from = date_range_arr[0];
-                                            date_range.to = date_range_arr[1];
-                                            disable_date_arr.push(date_range);
-                                        } else {
-                                            disable_date_arr.push(date_disable.meta_value);
+                                    if (date_disable.meta_value.includes('to')) {
+                                        var date_range_arr = date_disable.meta_value.split(' to ');
+                                        var date_range = {};
+                                        date_range.from = date_range_arr[0];
+                                        date_range.to = date_range_arr[1];
+                                        disable_date_arr.push(date_range);
+                                    } else {
+                                        disable_date_arr.push(date_disable.meta_value);
+                                    }
+                                })
+
+                                //Если передали дату из инпута, которая была сохранена ранее не будем вставлять ее в disable_date
+                                if (selected_date) {
+                                    if (selected_date.includes('to')) {
+                                        var selected_date_arr = [];
+                                        var filtred_selected_date = {};
+                                        selected_date_arr = selected_date.split(' to ');
+                                        filtred_selected_date.from = selected_date_arr[0];
+                                        filtred_selected_date.to = selected_date_arr[1];
+                                    } else {
+                                        var filtred_selected_date = selected_date;
+                                    }
+                                    disable_date_arr.forEach(function(date_disable, index, object) {
+                                        if (JSON.stringify(date_disable) == JSON.stringify(filtred_selected_date)) {
+                                            object.splice(index, 1);
                                         }
                                     })
-                                    //console.log(disable_date_arr);
+                                }
+                                // console.log(disable_date_arr);
                             }
                         }
 

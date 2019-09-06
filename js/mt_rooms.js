@@ -71,7 +71,7 @@ function mth_get_room(room_id) {
     })(jQuery);
 }
 
-//функция создания оций в селекте комнаты
+//функция создания опций в селекте комнаты
 function rooms_to_select(data) {
     (function($) {
         var rooms = data;
@@ -93,9 +93,11 @@ function rooms_to_select(data) {
         if ($(hidden_input).val() != "") {
             var hidden_input_val = $(hidden_input).val();
             $(select).val(hidden_input_val);
+        } else {
+            $(hidden_input).attr('value', rooms[0].id);
+            $(select + ' [value="' + rooms[0].id + '"]').attr("selected", "selected");
         }
         //меняем value hidden input
-        $(hidden_input).attr('value', rooms[0].id);
         //DatePicker
         var room_id = [];
         room_id.push(rooms[0].id);
@@ -105,7 +107,7 @@ function rooms_to_select(data) {
 
 }
 
-function mth_get_date_picker(room_id, is_front, selector) {
+function mth_get_date_picker(room_id, is_front, selector, selected_date = "") {
     //console.log(room_id);
     (function($) {
         $.ajax({

@@ -33,7 +33,27 @@ global $motohome_db_version;
 $motohome_db_version = "2.0";
 // require_once(ABSPATH . 'wp-content/plugins/moto-home/cmb2-functions.php');//ф-ции для cmb2 полей
 //ф-ция установки плагина, тут добавим таблицы в БД, тип POST, meta-поля и др. настройки
- function motohome_install(){	
+ function motohome_install(){
+    $role = "mth_realtor";
+    $display_name = 'Риелтор';
+    $capabilities = array (
+        'read' => true,
+        'edit_motohome' => true,
+        'edit_motohomes'=> true,
+        'publish_motohomes'=> true,
+        'read_motohome'=> true,
+        'read_private_motohomes'=> true,
+        'delete_motohomes'=> true,
+        'edit_others_motohomes'=> true,
+        'edit_mt_booking'=> true,
+        'edit_mt_bookings'=> true,
+        'publish_mt_bookings'=> true,
+        'read_mt_booking'=> true,
+        'read_private_mt_bookings'=> true,
+        'delete_mt_booking'=> true,
+        'edit_others_mt_bookings'=> true,
+    );
+    add_role( $role, $display_name, $capabilities );	
 	add_action( 'admin_notices', 'mth_install_notice' );	
  }
 //хук активации (установки) плагина
@@ -71,7 +91,16 @@ function motohome_type_register() {
 		'show_ui'             => true,
 		'show_in_menu'        => true,
 		'exclude_from_search' => false,
-		//'capability_type'     => array ("МотоДом","МотоДома"), //Пока какая-то проблема с разрешениями и ролями, не разобрался
+        'capability_type'     => array ("motohome","motohomes"),
+        'capabilities' => array(
+            'edit_post' => 'edit_motohome',
+            'edit_posts' => 'edit_motohomes',
+            'publish_posts' => 'publish_motohomes',
+            'read_post' => 'read_motohome',
+            'read_private_posts' => 'read_private_motohomes',
+            'delete_post' => 'delete_motohomes',
+            'edit_others_posts' => 'edit_others_motohomes'
+        ),
 		'map_meta_cap'        => true,
 		'hierarchical'        => false,
         'query_var'           => true,
@@ -127,7 +156,16 @@ function mt_booking_type_register() {
 		'show_ui'             => true,
 		'show_in_menu'        => true,
 		'exclude_from_search' => false,
-		//'capability_type'     => array ("МотоДом","МотоДома"), //Пока какая-то проблема с разрешениями и ролями, не разобрался
+        'capability_type'     =>'mt_booking', 
+        'capabilities' => array(
+            'edit_post' => 'edit_mt_booking',
+            'edit_posts' => 'edit_mt_bookings',
+            'publish_posts' => 'publish_mt_bookings',
+            'read_post' => 'read_mt_booking',
+            'read_private_posts' => 'read_private_mt_bookings',
+            'delete_post' => 'delete_mt_booking',
+            'edit_others_posts' => 'edit_others_mt_bookings'
+        ),
 		'map_meta_cap'        => true,
 		'hierarchical'        => false,
         'query_var'           => true,
@@ -135,6 +173,29 @@ function mt_booking_type_register() {
 	);
     register_post_type('mt_booking',$args);
 }
+
+//Добавляем новые права к роли администратора
+function mt_capabilities_add(){
+
+    $admins = get_role( 'administrator' );
+
+    $admins->add_cap( 'edit_mt_booking' ); 
+    $admins->add_cap( 'edit_mt_bookings' ); 
+    $admins->add_cap( 'publish_mt_bookings' ); 
+    $admins->add_cap( 'read_mt_booking' ); 
+    $admins->add_cap( 'read_private_mt_bookings' ); 
+    $admins->add_cap( 'delete_mt_booking' ); 
+    $admins->add_cap( 'edit_others_mt_bookings' ); 
+
+    $admins->add_cap( 'edit_motohome' ); 
+    $admins->add_cap( 'edit_motohomes' ); 
+    $admins->add_cap( 'publish_motohomes' ); 
+    $admins->add_cap( 'read_motohome' ); 
+    $admins->add_cap( 'read_private_motohomes' ); 
+    $admins->add_cap( 'delete_motohomes' ); 
+    $admins->add_cap( 'edit_others_motohomes' ); 
+}
+add_action( 'admin_init', 'mt_capabilities_add');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Добавляем Yandex Map к типу motohome

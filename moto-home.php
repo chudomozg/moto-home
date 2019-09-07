@@ -553,4 +553,64 @@ function mth_get_term_to_hid_city_inp(){
 	wp_send_json( $term);
 }
 
+## Удаление базовых элементов (ссылок) из админ тулбара
+add_action('add_admin_bar_menus', function(){
+	/* доступно для удаления:
+
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_my_account_menu', 0 );  // Внутренние ссылки меню профиля
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_search_menu', 4 );      // поиск
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_my_account_item', 7 );  // Полностью меню профиля
+
+	// Связанное с сайтом
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_sidebar_toggle', 0 );   // 
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_wp_menu', 10 );         // WordPress ссылки (WordPress лого)
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_my_sites_menu', 20 );   // мои сайты
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_site_menu', 30 );       // сайты
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_customize_menu', 40 );  // настроить тему
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_updates_menu', 50 );    // обновления
+
+	// Content related.
+	if ( ! is_network_admin() && ! is_user_admin() ) {
+		remove_action( 'admin_bar_menu', 'wp_admin_bar_comments_menu', 60 );    // комментарии
+		remove_action( 'admin_bar_menu', 'wp_admin_bar_new_content_menu', 70 ); // добавить запись, страницу, медиафайл и т.д.
+	}
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_edit_menu', 80 ); // редактировать
+
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_add_secondary_groups', 200 ); // вся дополнительная группа (поиск и аккаунт) расположена справа в меню
+	*/
+
+	// удаляем
+	// remove_action( 'admin_bar_menu', 'wp_admin_bar_customize_menu', 40); // Настроить тему
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_search_menu', 4 );    // поиск
+    remove_action( 'admin_bar_menu', 'wp_admin_bar_wp_menu', 10 );      // WordPress ссылки (WordPress лого)
+    remove_action( 'admin_bar_menu', 'wp_admin_bar_my_sites_menu', 20 );   // мои сайты
+    remove_action( 'admin_bar_menu', 'wp_admin_bar_site_menu', 30 );       // сайты
+});
+
+// Добавляет ссылку в админ бар
+add_action( 'admin_bar_menu', 'mth_admin_bar_menu', 30 );
+function mth_admin_bar_menu( $wp_admin_bar ) {
+	$wp_admin_bar->add_menu( array(
+		'id'    => 'mth_admin_toolbar_menu',
+		'title' => 'Мотодома и брони',
+		// 'href'  => '#',
+	) );
+    
+    $site_url = get_site_url();
+	$wp_admin_bar->add_menu( array(
+		'parent' => 'mth_admin_toolbar_menu', // параметр id из первой ссылки
+		'id'     => 'mth_admin_toolbar_motohome', // свой id, чтобы можно было добавить дочерние ссылки
+		'title'  => 'Мотодома',
+		'href'   => $site_url.'/wp-admin/edit.php?post_type=motohome',
+    ) );
+    $wp_admin_bar->add_menu( array(
+		'parent' => 'mth_admin_toolbar_menu', // параметр id из первой ссылки
+		'id'     => 'mth_admin_toolbar_booking', // свой id, чтобы можно было добавить дочерние ссылки
+		'title'  => 'Брони',
+		'href'   => $site_url.'/wp-admin/edit.php?post_type=mt_booking',
+	) );
+}
+
+
+
  ?>

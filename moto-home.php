@@ -43,7 +43,8 @@ $motohome_db_version = "2.0";
         'publish_motohomes'=> true,
         'read_motohome'=> true,
         'read_private_motohomes'=> true,
-        'delete_motohomes'=> true,
+		'delete_motohomes'=> true,
+		'delete_motohome' => true,
         'edit_others_motohomes'=> true,
         'edit_mt_booking'=> true,
         'edit_mt_bookings'=> true,
@@ -51,6 +52,7 @@ $motohome_db_version = "2.0";
         'read_mt_booking'=> true,
         'read_private_mt_bookings'=> true,
         'delete_mt_booking'=> true,
+        'delete_mt_bookings'=> true,
         'edit_others_mt_bookings'=> true,
     );
     add_role( $role, $display_name, $capabilities );	
@@ -98,10 +100,11 @@ function motohome_type_register() {
             'publish_posts' => 'publish_motohomes',
             'read_post' => 'read_motohome',
             'read_private_posts' => 'read_private_motohomes',
-            'delete_post' => 'delete_motohomes',
+			'delete_post' => 'delete_motohome',
+			'delete_posts' => 'delete_motohomes',
             'edit_others_posts' => 'edit_others_motohomes'
         ),
-		'map_meta_cap'        => true,
+		'map_meta_cap'        => false,
 		'hierarchical'        => false,
         'query_var'           => true,
         'show_in_rest' => true,
@@ -164,9 +167,10 @@ function mt_booking_type_register() {
             'read_post' => 'read_mt_booking',
             'read_private_posts' => 'read_private_mt_bookings',
             'delete_post' => 'delete_mt_booking',
+            'delete_posts' => 'delete_mt_bookings',
             'edit_others_posts' => 'edit_others_mt_bookings'
         ),
-		'map_meta_cap'        => true,
+		'map_meta_cap'        => false,
 		'hierarchical'        => false,
         'query_var'           => true,
         'show_in_rest' => true,
@@ -185,6 +189,7 @@ function mt_capabilities_add(){
     $admins->add_cap( 'read_mt_booking' ); 
     $admins->add_cap( 'read_private_mt_bookings' ); 
     $admins->add_cap( 'delete_mt_booking' ); 
+    $admins->add_cap( 'delete_mt_bookings' ); 
     $admins->add_cap( 'edit_others_mt_bookings' ); 
 
     $admins->add_cap( 'edit_motohome' ); 
@@ -192,10 +197,23 @@ function mt_capabilities_add(){
     $admins->add_cap( 'publish_motohomes' ); 
     $admins->add_cap( 'read_motohome' ); 
     $admins->add_cap( 'read_private_motohomes' ); 
+    $admins->add_cap( 'delete_motohome' ); 
     $admins->add_cap( 'delete_motohomes' ); 
     $admins->add_cap( 'edit_others_motohomes' ); 
 }
 add_action( 'admin_init', 'mt_capabilities_add');
+
+
+//Вывод риелторов в select на странице редактирования Мотодомов
+function mth_get_realtor (){
+	$users = get_users(['role'=>'mth_realtor']);
+	$users_to_select =  [];
+	foreach ($users as $user){
+		$users_to_select = array_push_assoc($users_to_select, $user->data->ID, $user->data->user_nicename);
+		// ChromePhp::log($user); 
+	}
+	return $users_to_select;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Добавляем Yandex Map к типу motohome
@@ -291,62 +309,109 @@ add_action( 'wp_ajax_mth_select_update', 'mth_select_update' );
 add_action( 'wp_ajax_nopriv_mth_select_update', 'mth_select_update' ); //проверить будет ли работать без нее с правами на опр польз
 
 
-//Создание брони пользователем сайта
+//Создание брони пользователем сайта 
 function mth_user_create_reserv(){
-	$room_id =  $_POST['room_id'];
-	$motohome_id = substr($room_id, 0, strpos($room_id, "-"));
-	$reserv_date =  $_POST['date'];
-	$response = [$room_id,$reserv_date];
-	global $wpdb;
+	$user_id = get_current_user_id();
+	//если залогинен
+	if ($user_id > 0){
+		$room_id =  $_POST['room_id'];
+		$motohome_id = substr($room_id, 0, strpos($room_id, "-"));
+		$reserv_date =  $_POST['date'];
+		$response = [$room_id,$reserv_date];
+		global $wpdb;
+
+		// Создаем массив данных новой записи
+		$post_data = array(
+			'post_title'    => wp_strip_all_tags($room_id."-???"),
+			'post_content'  =>	'',
+			'post_status'   => 'publish',
+			'post_author'   => get_current_user_id(),
+			'post_type' => 'mt_booking',
+		);
+
+		// Вставляем запись в базу данных
+		$post_id = wp_insert_post( $post_data );
+
+		//Добавляем значение meta полей в БД
+		// $table =$wpdb->prefix.'postmeta';
+		// //Дата бронирования
+		// $data=array('post_id'=>$post_id, 'meta_key'=>'_mth_bookdate', 'meta_value'=>$reserv_date);
+		// $format = array('%d', '%s', '%s');
+		// $wpdb->insert( $table, $data, $format );
+
+		//Дата бронирования
+		carbon_set_post_meta( $post_id, 'mth_bookdate', $reserv_date );
+		//id комнаты
+		carbon_set_post_meta( $post_id, 'mth_rooms_select_hidden', $room_id );
+		//Статус брони
+		carbon_set_post_meta( $post_id, 'mth_stat_select', 'received' );
+		//Какая комната assoc
+		$mth_assoc = array( 
+			0 => array(
+				'id' => $motohome_id,
+				'type' => 'post',
+				'subtype' => 'motohome',
+				'value' => 'post:motohome:'.$motohome_id,
+			));
+		carbon_set_post_meta( $post_id, 'mth_assoc', $mth_assoc );
+
+		//обновляем title post mt_booking
+		$booking_post = array();
+		$booking_post['ID']=$post_id;
+		$booking_post["post_title"]=$room_id."-".$post_id;
+		wp_update_post( wp_slash($booking_post) );
+
+		//отправляем почту
+		mth_send_mail ($user_id, $post_id, $motohome_id, $room_id);
+
+		//Отправляем ответ
+		wp_send_json(array (true, $post_id, $motohome_id, $user_id));
+	}else{
+		wp_send_json(array (false));
+	}
 	
-
-	// Создаем массив данных новой записи
-	$post_data = array(
-		'post_title'    => wp_strip_all_tags($room_id."-???"),
-		'post_content'  =>	'',
-		'post_status'   => 'publish',
-		'post_author'   => get_current_user_id(),
-		'post_type' => 'mt_booking',
-	);
-
-	// Вставляем запись в базу данных
-	$post_id = wp_insert_post( $post_data );
-
-	//Добавляем значение meta полей в БД
-	// $table =$wpdb->prefix.'postmeta';
-	// //Дата бронирования
-	// $data=array('post_id'=>$post_id, 'meta_key'=>'_mth_bookdate', 'meta_value'=>$reserv_date);
-	// $format = array('%d', '%s', '%s');
-	// $wpdb->insert( $table, $data, $format );
-
-	//Дата бронирования
-	carbon_set_post_meta( $post_id, 'mth_bookdate', $reserv_date );
-	//id комнаты
-	carbon_set_post_meta( $post_id, 'mth_rooms_select_hidden', $room_id );
-	//Статус брони
-	carbon_set_post_meta( $post_id, 'mth_stat_select', 'received' );
-	//Какая комната assoc
-	$mth_assoc = array( 
-		0 => array(
-			'id' => $motohome_id,
-			'type' => 'post',
-			'subtype' => 'motohome',
-			'value' => 'post:motohome:'.$motohome_id,
-		));
-	carbon_set_post_meta( $post_id, 'mth_assoc', $mth_assoc );
-
-	//обновляем title post mt_booking
-	$booking_post = array();
-	$booking_post['ID']=$post_id;
-	$booking_post["post_title"]=$room_id."-".$post_id;
-	wp_update_post( wp_slash($booking_post) );
-
-
-	wp_send_json(array ($post_id, $motohome_id));
 }
 
 add_action( 'wp_ajax_mth_user_create_reserv', 'mth_user_create_reserv' );
 add_action( 'wp_ajax_nopriv_mth_user_create_reserv', 'mth_user_create_reserv' );
+
+//ф-ция отправки писем
+function mth_send_mail ($user_id, $booking_id, $motohome_id, $room_id){
+	$realtor_id = carbon_get_post_meta( $motohome_id, 'mth_realtor');
+	$realtor = get_user_by('ID', $realtor_id);
+	$user = get_user_by('ID', $user_id);
+	$realtor_email = $realtor->data->user_email;
+	$user_email = $user->data->user_email;
+	$booking_url = '<a href="'.get_edit_post_link($booking_id).'">Проверка</a>';
+	$date = carbon_get_post_meta( $booking_id, 'mth_bookdate');
+
+	//Отправляем письмо риелтору
+	$subject = 'Новая бронь: moto-tours.me';
+	$message = 'Новая бронь на сайте moto-tours.me <br/>
+				№:<b>'.$booking_id.'</b><br/>
+				Ссылка: <b>'.$booking_url.'</b><br/>
+				Пользователь: <b>'.$user->data->user_nicename.'</b><br/>
+				Мотодом: <b>'.$motohome_id.'</b><br/>
+				Комната: <b>'.$room_id.'</b><br/>
+				Дата брони: <b>'.$date.'</b><br/>
+				';
+	$headers = 'content-type: text/html';
+	wp_mail( $realtor_email, $subject, $message, $headers);
+	
+	//Юзеру
+	$subject = 'Ваша бронь: moto-tours.me';
+	$message = 'Ваша бронь на сайте moto-tours.me <br/>
+				Была принята, ожидайте звонка от риелтора, для подтверждения брони<br/>
+				Детали<br/>
+				№:<b>'.$booking_id.'</b><br/>
+				Мотодом: <b>'.$motohome_id.'</b><br/>
+				Комната: <b>'.$room_id.'</b><br/>
+				Дата брони: <b>'.$date.'</b><br/>
+				';
+	$headers = 'content-type: text/html';
+	wp_mail( $user_email, $subject, $message, $headers);
+
+}
 
 function mth_date_picker_get_booking_time(){
 	if (isset($_POST['room_id'])){
@@ -611,6 +676,30 @@ function mth_admin_bar_menu( $wp_admin_bar ) {
 	) );
 }
 
+
+//Добавляем пункты в менюшку woocommerce 
+function mth_iconic_account_menu_items( $items ) {
+	$items['booking'] = __( 'Мои бронирования', 'iconic' );
+	return $items;
+}
+add_filter( 'woocommerce_account_menu_items', 'mth_iconic_account_menu_items', 10, 1 );
+
+/**
+ * Add endpoint
+ */
+function mth_iconic_add_my_account_endpoint() {
+	add_rewrite_endpoint( 'booking', EP_PAGES );
+}
+add_action( 'init', 'mth_iconic_add_my_account_endpoint' );
+
+/**
+* booking content
+*/
+function mth_iconic_booking_endpoint_content() {
+	$content = '<h3>История бронирований мотодомов</h3>';
+	echo $content;
+}
+add_action( 'woocommerce_account_booking_endpoint', 'mth_iconic_booking_endpoint_content' );
 
 
  ?>

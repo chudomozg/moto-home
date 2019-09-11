@@ -54,8 +54,18 @@ Container::make( 'post_meta', 'Настройки МотоДома' )
                                         ->set_attribute( 'maxLength', 485 )
 			
 		))
-		->set_visible_in_rest_api( true )
+                ->set_visible_in_rest_api( true )
 
 ) );
+
+
+Container::make( 'post_meta', 'Привязка к риелтору' )
+    ->show_on_post_type('motohome')
+    ->set_context('side')
+    ->set_priority('core')
+    ->add_fields( array(
+        Field::make( 'select', 'mth_realtor', 'Выберите ответственного' )
+        ->set_options(mth_get_realtor())
+    ) );
 
 ?>

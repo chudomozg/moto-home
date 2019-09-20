@@ -316,7 +316,7 @@ function mth_user_create_reserv(){
 	if ($user_id > 0){
 		$room_id =  $_POST['room_id'];
 		$motohome_id = substr($room_id, 0, strpos($room_id, "-"));
-		$reserv_date =  $_POST['date'];
+		$reserv_date = str_replace('-', 'to', $_POST['date']) ;
 		$response = [$room_id,$reserv_date];
 		global $wpdb;
 
@@ -696,10 +696,58 @@ add_action( 'init', 'mth_iconic_add_my_account_endpoint' );
 * booking content
 */
 function mth_iconic_booking_endpoint_content() {
-	$content = '<h3>История бронирований мотодомов</h3>';
-	echo $content;
+	$title = '<h3>История бронирований Мотодомов</h3>';
+	$user_id = get_current_user_id();
+	echo $title;
+	echo '<table><tr><th>№ Брони</th><th>Дата</th><th>Мотодом</th><th>Комната</th><th>Статус</th></tr>';
+	$query = new WP_Query([
+		'author' => $user_id,
+		'post_type'      => 'mt_booking',
+		// 'posts_per_page' => '10', //пагинацию потом надо дописать posts_nav_link(); после цикла не работает
+	]);
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		$post_id = get_the_ID();
+		$motohome_assoc_array = carbon_get_post_meta( $post_id, 'mth_assoc');
+		$motohome_id = $motohome_assoc_array[0]['id'];
+		echo '<tr>';
+		echo '<td>'.get_the_title().'</td>'; // выведем заголовок поста
+		echo '<td>'.mth_get_russian_booking_date(carbon_get_post_meta( $post_id, 'mth_bookdate')).'</td>'; //дата
+		echo '<td><a href="'.get_permalink($motohome_id).'" target="_blank">№ '.$motohome_id.'</a></td>'; //Мотодом
+		echo '<td>№ '.carbon_get_post_meta( $post_id, 'mth_rooms_select_hidden').'</td>'; //комната
+		echo '<td>'.mth_get_russian_booking_status(carbon_get_post_meta( $post_id, 'mth_stat_select')).'</td>'; //статус
+
+		echo '<tr/>';
+	}
+	echo '</table>';
 }
 add_action( 'woocommerce_account_booking_endpoint', 'mth_iconic_booking_endpoint_content' );
 
 
+function mth_get_russian_booking_status ($status){
+	switch ($status){
+		case 'received':
+			return 'Получена';
+			break;
+		case 'confirmed':
+			return 'Подтверждена';
+			break;
+		case 'paid':
+			return 'Оплачена';
+			break;
+		case 'canceled':
+			return 'Отменена';
+			break;
+	}
+}
+
+function mth_get_russian_booking_date ($booking_date){
+	$delimiter = stripos ($booking_date, 'to');
+	if ($delimiter!=false){
+		$filtred_date = str_replace ('to', 'по', $booking_date);
+		$filtred_date = 'c '.$filtred_date;
+		return $filtred_date;
+	};
+	return $booking_date;
+}
  ?>

@@ -750,4 +750,29 @@ function mth_get_russian_booking_date ($booking_date){
 	};
 	return $booking_date;
 }
+
+
+function mth_get_users_to_select(){
+	$user_arr = get_users();
+	$options = [];
+	foreach ($user_arr as $user){
+		$usermeta =  get_user_meta ($user->data->ID);
+		$options = array_push_assoc($options, $user->data->ID, $user->data->user_nicename.': '.$usermeta['first_name'][0].' '.$usermeta['last_name'][0]);
+	}
+	return $options;
+}
+
+function mth_get_user_meta(){
+	$user_meta = get_user_meta($_POST['user_id']);
+	$meta_output = [
+		'first_name' => $user_meta['first_name'][0],
+		'last_name' => $user_meta['last_name'][0],
+		'phone' => $user_meta['billing_phone'][0],
+		'email' => $user_meta['billing_email'][0],
+	];
+	wp_send_json($meta_output);
+}
+add_action( 'wp_ajax_mth_get_user_meta', 'mth_get_user_meta' );
+add_action( 'wp_ajax_nopriv_mth_get_user_meta', 'mth_get_user_meta' );
+
  ?>

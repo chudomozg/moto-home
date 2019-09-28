@@ -17,6 +17,40 @@ $(document).ready(function() {
         $(region_select).trigger('change');
         mth_get_city_term_id($("#post_ID").val());
     }
+
+    //На странице редактирования Брони
+    if ($('.post-type-mt_booking.wp-admin').length) {
+        var user_select = 'select[name="carbon_fields_compact_input[_mth_user]"]';
+        $(document).on('change', user_select, function() {
+            var user_id = $(user_select).val();
+            $('input[name="carbon_fields_compact_input[_mth_user_firstname]"]').val('Загрузка...');
+            $('input[name="carbon_fields_compact_input[_mth_user_lastname]"]').val('Загрузка...');
+            $('input[name="carbon_fields_compact_input[_mth_user_phone]"]').val('Загрузка...');
+            $('input[name="carbon_fields_compact_input[_mth_user_email]"]').val('Загрузка...');
+            $.ajax({
+                url: site_url + '/wp-admin/admin-ajax.php',
+                type: "POST",
+                data_type: 'json',
+                data: {
+                    "action": 'mth_get_user_meta',
+                    'user_id': user_id,
+                },
+                success: function(data) {
+                    //alert('success');
+                    console.log(data);
+                    $('input[name="carbon_fields_compact_input[_mth_user_firstname]"]').val(data.first_name);
+                    $('input[name="carbon_fields_compact_input[_mth_user_lastname]"]').val(data.last_name);
+                    $('input[name="carbon_fields_compact_input[_mth_user_phone]"]').val(data.phone);
+                    $('input[name="carbon_fields_compact_input[_mth_user_email]"]').val(data.email);
+                },
+                error: function(error) { console.error(error) }
+            });
+        });
+        $(user_select).val(function() {
+            return $(user_select).val();
+        });
+        $(user_select).trigger('change');
+    }
 })
 
 //загружаем города по выбранному региону и выводим их в селект городов

@@ -92,7 +92,12 @@ function mth_yamap_add_city_collection(mth_homes_array) {
 
         //console.log(mthCollectionArray);
         myMap.geoObjects.add(mthCollectionArray);
-        myMap.setBounds(mthCollectionArray.getBounds(), { zoomMargin: 100 });
+        if (mth_homes_array.length > 1) {
+            myMap.setBounds(mthCollectionArray.getBounds(), { zoomMargin: 100 });
+        } else {
+            myMap.setBounds(mthCollectionArray.getBounds(), {});
+            myMap.setZoom(16, { duration: 100 });
+        }
     }
 
 };

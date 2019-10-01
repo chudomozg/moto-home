@@ -130,8 +130,9 @@
     margin-right: auto;
     left: 0;
     right: 0;
-    text-align: center;
     width: 60%;
+    justify-content: space-evenly;
+    display: flex;
 }
 
 .single .lightpick .lightpick__toolbar {

@@ -380,41 +380,63 @@ add_action( 'wp_ajax_mth_user_create_reserv', 'mth_user_create_reserv' );
 add_action( 'wp_ajax_nopriv_mth_user_create_reserv', 'mth_user_create_reserv' );
 
 //ф-ция отправки писем
-function mth_send_mail ($user_id, $booking_id, $motohome_id, $room_id){
+function mth_send_mail ($user_id, $booking_id, $motohome_id, $room_id, $update = false, $status = 'received'){
 	$realtor_id = carbon_get_post_meta( $motohome_id, 'mth_realtor');
 	$realtor = get_user_by('ID', $realtor_id);
 	$user = get_user_by('ID', $user_id);
 	$realtor_email = $realtor->data->user_email;
 	$user_email = $user->data->user_email;
-	$booking_url = '<a href="'.get_edit_post_link($booking_id).'">Проверка</a>';
-	$date = carbon_get_post_meta( $booking_id, 'mth_bookdate');
+	$booking_url = '<a href="'.get_edit_post_link($booking_id).'">Бронь #'.$booking_id.'</a>';
+	$date = mth_get_russian_booking_date(carbon_get_post_meta( $booking_id, 'mth_bookdate'));
+	$user_meta = get_user_meta($user_id);
+	$status = mth_get_russian_booking_status($status);
 
-	//Отправляем письмо риелтору
-	$subject = 'Новая бронь: moto-tours.me';
-	$message = 'Новая бронь на сайте moto-tours.me <br/>
-				№:<b>'.$booking_id.'</b><br/>
-				Ссылка: <b>'.$booking_url.'</b><br/>
-				Пользователь: <b>'.$user->data->user_nicename.'</b><br/>
-				Мотодом: <b>'.$motohome_id.'</b><br/>
-				Комната: <b>'.$room_id.'</b><br/>
-				Дата брони: <b>'.$date.'</b><br/>
-				';
-	$headers = 'content-type: text/html';
-	wp_mail( $realtor_email, $subject, $message, $headers);
-	
-	//Юзеру
-	$subject = 'Ваша бронь: moto-tours.me';
-	$message = 'Ваша бронь на сайте moto-tours.me <br/>
-				Была принята, ожидайте звонка от риелтора, для подтверждения брони<br/>
-				Детали<br/>
-				№:<b>'.$booking_id.'</b><br/>
-				Мотодом: <b>'.$motohome_id.'</b><br/>
-				Комната: <b>'.$room_id.'</b><br/>
-				Дата брони: <b>'.$date.'</b><br/>
-				';
-	$headers = 'content-type: text/html';
-	wp_mail( $user_email, $subject, $message, $headers);
+	if ($update == true){//При обновлении статуса или изменении любого параметра
+		//Юзеру
+		$subject = 'Ваша бронь обновлена: moto-tours.me';
+		$message = 'Ваша бронь на сайте moto-tours.me была обновлена.<br/>
+					<b>Детали</b><br/>
+					№:<b>'.$booking_id.'</b><br/>
+					Мотодом: <b>'.$motohome_id.'</b><br/>
+					Комната: <b>'.$room_id.'</b><br/>
+					Дата брони: <b>'.$date.'</b><br/>
+					Статус брони: <b>'.$status.'</b><br/> 
+					';
+		$headers = 'content-type: text/html';
+		wp_mail( $user_email, $subject, $message, $headers);
 
+	}else{//При добавлении новой брони
+
+		//Отправляем письмо риелтору
+		$subject = 'Новая бронь: moto-tours.me';
+		$message = 'Новая бронь на сайте moto-tours.me <br/>
+					№:<b>'.$booking_id.'</b><br/>
+					Ссылка: <b>'.$booking_url.'</b><br/>
+					Пользователь: <b>'.$user->data->user_nicename.": ".$user_meta['first_name'][0]." ".$user_meta['last_name'][0].'</b><br/>
+					Телефон: <b>'.$user_meta['billing_phone'][0].'</b><br/>
+					Email: <b>'.$user_meta['billing_email'][0].'</b><br/>
+					Мотодом: <b>'.$motohome_id.'</b><br/>
+					Комната: <b>'.$room_id.'</b><br/>
+					Дата брони: <b>'.$date.'</b><br/>
+					Статус брони: <b>'.$status.'</b><br/> 
+					';
+		$headers = 'content-type: text/html';
+		wp_mail( $realtor_email, $subject, $message, $headers);
+		
+		//Юзеру
+		$subject = 'Ваша новая бронь: moto-tours.me';
+		$message = 'Ваша бронь на сайте moto-tours.me <br/>
+					Была принята, ожидайте звонка от риелтора, для подтверждения брони<br/>
+					Детали<br/>
+					№:<b>'.$booking_id.'</b><br/>
+					Мотодом: <b>'.$motohome_id.'</b><br/>
+					Комната: <b>'.$room_id.'</b><br/>
+					Дата брони: <b>'.$date.'</b><br/>
+					Статус брони: <b>'.$status.'</b><br/> 
+					';
+		$headers = 'content-type: text/html';
+		wp_mail( $user_email, $subject, $message, $headers);
+	}
 }
 
 function mth_date_picker_get_booking_time(){
@@ -598,9 +620,20 @@ function mth_id_to_title($post_id ){
 	if (get_post_type($post_id) == $post_type){
 		if (isset($_POST['post_ID'])&&isset($_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden'])){
 			global $wpdb;
+			$user_id = $_POST['carbon_fields_compact_input']['_mth_user'];
+			$motohome = explode ($_POST['carbon_fields_compact_input']['_mth_assoc'][0]);
+			$motohome_id = $motohome[2];
+			$room_id = $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden'];
 			$title =  $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']."-".$_POST['post_ID'];
+			$status = $_POST['carbon_fields_compact_input']['_mth_stat_select'];
+			mth_send_mail ($user_id, $post_id, $motohome_id, $room_id, true, $status);
 			$wpdb->update( $wpdb->posts, array( 'post_title' =>  $title ), array( 'ID' => $post_id ) );	
 		}
+		//Отправляем письмо пользователю
+		// mth_send_mail ($user_id, $booking_id, $motohome_id, $room_id, true);
+		// $motohome_id = explode ('-', $_POST['carbon_fields_compact_input']['_mth_rooms_select_hidden']);
+		// $motohome_id = $motohome_id[0];
+		
 	}
 }
 	

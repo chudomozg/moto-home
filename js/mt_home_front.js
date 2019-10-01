@@ -5,6 +5,7 @@
             var parent_id = $('#wp_cn_front_region_select').val();
             mth_get_option_city_select(parent_id);
             $('#wp_cn_front_region_select').change(function() {
+                parent_id = $('#wp_cn_front_region_select').val();
                 mth_get_option_city_select(parent_id);
             });
             $('#wp_cn_front_city_select').change(function() {

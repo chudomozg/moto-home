@@ -41,6 +41,7 @@
                     action: 'mth_user_create_reserv',
                     date: mth_date,
                     room_id: room_id,
+                    // user_id: user_id,
                 },
                 success: function(data) {
                     // rooms_to_select(data);

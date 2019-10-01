@@ -71,25 +71,25 @@ Container::make( 'post_meta', 'Настройки брони МотоДома' )
      //Имя
      Field::make( 'text', 'mth_user_firstname', 'Имя' )
      ->set_width( 25 )
-     ->set_required( true )
+    //  ->set_required( true )
      ->set_visible_in_rest_api( true ),
 
      //Фамилия
      Field::make( 'text', 'mth_user_lastname', 'Фамилия' )
      ->set_width( 25 )
-     ->set_required( true )
+    //  ->set_required( true )
      ->set_visible_in_rest_api( true ),
 
      //Телефон
      Field::make( 'text', 'mth_user_phone', 'Телефон' )
      ->set_width( 25 )
-     ->set_required( true )
+    //  ->set_required( true )
      ->set_visible_in_rest_api( true ),
 
      //Почта
      Field::make( 'text', 'mth_user_email', 'Почта' )
      ->set_width( 25 )
-     ->set_required( true )
+    //  ->set_required( true )
      ->set_visible_in_rest_api( true ),
 
 ) );

@@ -249,6 +249,7 @@ function mthome_ad_rooms_add( $hook ){
 	wp_localize_script( 'mt_home.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'site_url', get_site_url());
     wp_localize_script( 'mt_rooms.js', 'dir_url', dirName(__FILE__));
+    wp_localize_script( 'mt_home_front.js', 'user_id',get_current_user_id() );
 }
 
 
@@ -315,6 +316,7 @@ function mth_user_create_reserv(){
 	//если залогинен
 	if ($user_id > 0){
 		$room_id =  $_POST['room_id'];
+		$send_user_id = $_POST['user_id'];
 		$motohome_id = substr($room_id, 0, strpos($room_id, "-"));
 		$reserv_date = str_replace('-', 'to', $_POST['date']) ;
 		$response = [$room_id,$reserv_date];
@@ -345,6 +347,8 @@ function mth_user_create_reserv(){
 		carbon_set_post_meta( $post_id, 'mth_rooms_select_hidden', $room_id );
 		//Статус брони
 		carbon_set_post_meta( $post_id, 'mth_stat_select', 'received' );
+		//Пользователь
+		carbon_set_post_meta( $post_id, 'mth_user', $user_id );
 		//Какая комната assoc
 		$mth_assoc = array( 
 			0 => array(
@@ -774,5 +778,32 @@ function mth_get_user_meta(){
 }
 add_action( 'wp_ajax_mth_get_user_meta', 'mth_get_user_meta' );
 add_action( 'wp_ajax_nopriv_mth_get_user_meta', 'mth_get_user_meta' );
+
+//добавим колонки для броней
+
+function mth_booking_add_column( $post_columns ){
+	// Изменяем...	
+	foreach ($post_columns as $key=>$v){
+		$out .=$key.', ';
+	}
+	$post_columns['user']='Пользователь';
+	$post_columns['phone']='Телефон';
+	$post_columns['email']='email';
+
+	return $post_columns;
+}
+add_filter( 'manage_mt_booking_posts_columns', 'mth_booking_add_column' );
+
+function mth_booking_add_column_custom($column, $id){
+	$user_meta = get_user_meta(carbon_get_post_meta($id, 'mth_user'));
+	if($column === 'user'){
+		echo $user_meta['nickname'][0].": ".$user_meta['first_name'][0]." ".$user_meta['last_name'][0];
+	}elseif($column === 'phone'){
+		echo $user_meta['billing_phone'][0];
+	}elseif($column === 'email'){
+		echo $user_meta['billing_email'][0];
+	}
+}
+add_action('manage_mt_booking_posts_custom_column', 'mth_booking_add_column_custom', 10, 2 );
 
  ?>

@@ -68,7 +68,8 @@
 }
 
 .lightpick {
-    font-family: Roboto Regular !important;
+    /* font-family: Roboto Regular !important; */
+    font-family: system-ui, Roboto, Helvetica, Arial, sans-serif !important;
     padding: 0px !important;
     z-index: 1 !important;
 }

@@ -1,7 +1,7 @@
 ﻿(function($) {
     $(document).ready(function() {
         //подгружаем названия городов, если выбрали регион 
-        if ($('.single-post #wp_cn_front_city_select').length) {
+        if ($('.page #wp_cn_front_city_select').length) {
             var parent_id = $('#wp_cn_front_region_select').val();
             mth_get_option_city_select(parent_id);
             $('#wp_cn_front_region_select').change(function() {
@@ -148,7 +148,7 @@ function mth_add_home_list(mth_homes_array) {
                     media_id_arr.push(mth_home.motohome_gallery[i]);
                 }
                 media_html += '</div>';
-                var home_map = 'https://static-maps.yandex.ru/1.x/?ll=' + home_coords[1] + ',' + home_coords[0] + '&size=600,243&l=map&z=8&pt=' + home_coords[1] + ',' + home_coords[0] + ',pm2lbm';
+                var home_map = 'https://static-maps.yandex.ru/1.x/?ll=' + home_coords[1] + ',' + home_coords[0] + '&size=650,243&l=map&z=8&pt=' + home_coords[1] + ',' + home_coords[0] + ',pm2lbm';
                 var home_title = '<a href="' + mth_home.link + '">' + mth_home.title.rendered + '</a>';
                 var home_html = '' +
                     '<div class="mth_list_unit_wrapper">' +

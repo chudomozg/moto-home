@@ -816,9 +816,9 @@ add_action( 'wp_ajax_nopriv_mth_get_user_meta', 'mth_get_user_meta' );
 
 function mth_booking_add_column( $post_columns ){
 	// Изменяем...	
-	foreach ($post_columns as $key=>$v){
-		$out .=$key.', ';
-	}
+	// foreach ($post_columns as $key=>$v){
+	// 	$out .=$key.', ';
+	// }
 	$post_columns['user']='Пользователь';
 	$post_columns['phone']='Телефон';
 	$post_columns['email']='email';

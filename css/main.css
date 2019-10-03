@@ -2,6 +2,18 @@
     /* display: flex; */
 }
 
+.single .lightpick .lightpick__month-title .lightpick__select-months,
+.page .lightpick .lightpick__month-title .lightpick__select-months {
+    margin: -1px 10px 0px 0px;
+    padding: 0px;
+}
+
+.single .lightpick .lightpick__month-title .lightpick__select-years,
+.page .lightpick .lightpick__month-title .lightpick__select-years {
+    padding: 0px;
+    margin: 0px 10px 0px 0px;
+}
+
 .single-motohome .motohomeHeaderWrapper {
     margin: 35px 0 65px;
 }
@@ -267,6 +279,7 @@
     display: block;
     /* flex-wrap: wrap; */
     overflow: hidden;
+    width: 100%;
 }
 
 .mth_list_gallery {
